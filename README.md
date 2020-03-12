@@ -1,4 +1,4 @@
-# code-recomendation-system
+# code-recommendation-system
 Place file "coderec.py" in directory C:\Users\USERNAME\AppData\Roaming\Sublime Text 3\Packages\User\
 
 Add in Sublime Text 3 Key bindings:
