@@ -1,6 +1,4 @@
-package com.company;
-
-import com.company.parser.Parser;
+package org.suai;
 
 public class test {
     public static void main(String[] args) {

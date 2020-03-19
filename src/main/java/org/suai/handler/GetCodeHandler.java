@@ -1,6 +1,7 @@
-package com.company.handler;
+package org.suai.handler;
 
-import com.company.parser.Parser;
+import org.suai.Example;
+import org.suai.parser.Parser;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -8,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 public class GetCodeHandler extends HttpServlet {
@@ -19,19 +18,9 @@ public class GetCodeHandler extends HttpServlet {
         String funcName = parameterMap.get("func")[0];
         System.out.println("Request: " + funcName);
 
-        URL url = null;
-        try {
-            url = new URL("http://www.cplusplus.com/" + funcName);
-            System.out.println(url.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        String filename = "cplusplus_"+ funcName +".html";
-        String example = "Not found!";
-        if (url != null) {
-            example = Parser.parseData(url);
-        }
+//        String filename = "cplusplus_"+ funcName +".html";
+        Example example = Parser.parserCplusplus(funcName);
         PrintWriter out = resp.getWriter();
-        out.print("Example of usage " + funcName + "\n" + example);
+        out.print("Example of usage " + funcName + "\n" + example.getList().get(0).toString());
     }
 }

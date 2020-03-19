@@ -1,13 +1,18 @@
-package com.company.parser;
+package org.suai.parser;
+
+import com.jcabi.github.Github;
+import com.jcabi.github.RtGithub;
+import org.suai.Example;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class Parser {
-    public static void downloadWebpage(URL url, String fileName) {
+    private static void downloadWebpage(URL url, String fileName) {
         InputStream is = null;
         BufferedReader br;
         String line;
@@ -36,7 +41,15 @@ public class Parser {
         System.out.println("Webpage " + url.toString() + " downloaded successfully!");
     }
 
-    public static String parseData(URL url) {
+    public static Example parserCplusplus(String funcName) {
+        URL url = null;
+        try {
+            url = new URL("http://www.cplusplus.com/" + funcName);
+            System.out.println(url.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
         InputStream is = null;
         FileInputStream fis = null;
         BufferedReader br;
@@ -55,8 +68,8 @@ public class Parser {
             Pattern p_end = Pattern.compile(endPattern, Pattern.CASE_INSENSITIVE);
             Matcher m;
 
-            boolean findcheck = false;
-            while ((line = br.readLine()) != null && !findcheck) {
+            boolean findFlag = false;
+            while ((line = br.readLine()) != null && !findFlag) {
                 m = p_start.matcher(line);
                 stringCounter++;
                 while (m.find()) {
@@ -64,13 +77,18 @@ public class Parser {
 //                    out.append(line);
                     m = p_end.matcher(line);
                     while(!m.find()){
-                        line = br.readLine();
-                        out.append(line.replaceAll("\\<[^>]*>",""));
+                        String originalLine = br.readLine();
+                        line = originalLine.replaceAll("\\<[^>]*>",""); // exclude html-tags
+                        line = line.replaceAll("&lt;", "<").replaceAll("&gt;", ">"); // for libraries
+                        out.append(line);
                         out.append("\n");
-                        m = p_end.matcher(line);
+                        m = p_end.matcher(originalLine);
                     }
-                    findcheck = true;
+                    findFlag = true;
                 }
+            }
+            if (!findFlag) {
+                return new Example("Example is not found!");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,6 +102,10 @@ public class Parser {
             }
         }
 //        System.out.println("Done!");
-        return out.toString();
+        return new Example(out.toString());
     }
+
+//    public static Example parserGithub(String funcName) {
+//        Github github = new RtGithub();
+//    }
 }

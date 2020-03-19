@@ -1,6 +1,6 @@
-package com.company;
+package org.suai;
 
-import com.company.handler.GetCodeHandler;
+import org.suai.handler.GetCodeHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
