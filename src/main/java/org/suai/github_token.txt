@@ -1,0 +1,4 @@
+# Insert here your Github Token. It's needed for seach examples of code in github.com
+# If you're don't know what is it and how to generate it go to following link:
+# https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+# Example of token: c78x0z8czv74x7vzfd365hs3657s875s3js5t7sd (It's not valid)
