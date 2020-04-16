@@ -16,7 +16,7 @@ public class ParserCppreference implements Parser {
         URL url = null;
         try {
             url = new URL("https://en.cppreference.com/w/Special:Search/" + funcName);
-            System.out.println(url.toString());
+//            System.out.println(url.toString());
         } catch (MalformedURLException e) {
             throw new ParseException(e.getMessage());
         }
@@ -102,6 +102,7 @@ public class ParserCppreference implements Parser {
                         line = line.replaceAll("&lt;", "<").replaceAll("&gt;", ">"); // for libraries
                         line = line.replaceAll("&#160;", "").replaceAll("&#40;", "(").replaceAll("&#41;", ")");
                         line = line.replaceAll("&#123;", "{").replaceAll("&#125;", "}").replaceAll("&quot;", "\"");
+                        line = line.replaceAll("&#91;", "[").replaceAll("&#93;", "]");
                         out.append(line);
                         out.append("\n");
                         m = p_end.matcher(originalLine);

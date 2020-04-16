@@ -37,9 +37,15 @@ public class Example {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("//Source of examples: ").append(source).append("\n");
-        for (int i = 0; i < list.size(); i++) {
-            sb.append(i).append(": ").append(list.get(i)).append("\n");
+        sb.append("// Source of examples: ").append(source).append("\n");
+        if (list.isEmpty()) {
+            sb.append("// Sorry. Can't find examples.");
+        }
+        else {
+            for (int i = 0; i < list.size(); i++) {
+                sb.append("// Example ").append(i + 1).append("\n").append(list.get(i)).append("\n");
+                sb.append("// -------------------------------------------------------------- \n");
+            }
         }
         return sb.toString();
     }
