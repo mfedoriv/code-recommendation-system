@@ -47,11 +47,8 @@ public class HttpRedirectExample {
                     url      = next.toExternalForm();
                     continue;
             }
-
             break;
         }
-
-
     }
 
 }

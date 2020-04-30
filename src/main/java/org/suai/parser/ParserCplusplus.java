@@ -4,15 +4,12 @@ import org.suai.Example;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
 public class ParserCplusplus implements Parser {
 
@@ -105,7 +102,7 @@ public class ParserCplusplus implements Parser {
                 }
             }
             if (!findFlag) {
-                return new Example("Example is not found!", "cplusplus.com");
+                return new Example("cplusplus.com", "Example is not found!");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +112,7 @@ public class ParserCplusplus implements Parser {
             }
         }
 //        System.out.println("Done!");
-        return new Example(out.toString(), "cplusplus.com");
+        return new Example("cplusplus.com", out.toString());
     }
 
     /*private String getFuncURL(String funcName) throws ParseException {

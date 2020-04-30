@@ -125,6 +125,6 @@ public class ParserCppreference implements Parser {
             }
         }
 //        System.out.println("Done!");
-        return new Example(out.toString(), "cppreference.com");
+        return new Example("cppreference.com", out.toString());
     }
 }

@@ -1,5 +1,7 @@
 package org.suai.handler;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.suai.Example;
 import org.suai.parser.*;
 
@@ -27,11 +29,18 @@ public class GetCodeHandler extends HttpServlet {
             e.printStackTrace();
         }
         try (PrintWriter out = resp.getWriter()) {
-            out.print("// Example of usage " + funcName + "\n");
+            // Print as text
+            /*out.print("// Example of usage " + funcName + "\n");
             for (Example example : examples) {
                 out.print(example);
                 out.print("\n// ##############################################################\n");
+            }*/
+            // Print as JSON format
+            JSONArray results = new JSONArray();
+            for (int i = 0; i < examples.size(); i++) {
+                results.put(examples.get(i).toJSONObject());
             }
+            out.print(results); // JSONArray
         } catch (IOException e) {
             e.printStackTrace();
         }

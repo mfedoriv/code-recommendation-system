@@ -1,5 +1,8 @@
 package org.suai;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Example {
@@ -16,7 +19,7 @@ public class Example {
         source = src;
     }
 
-    public Example(String initExample, String src) {
+    public Example(String src, String initExample) {
         list = new ArrayList<>();
         list.add(initExample);
         source = src;
@@ -40,13 +43,19 @@ public class Example {
         sb.append("// Source of examples: ").append(source).append("\n");
         if (list.isEmpty()) {
             sb.append("// Sorry. Can't find examples.");
-        }
-        else {
+        } else {
             for (int i = 0; i < list.size(); i++) {
                 sb.append("// Example ").append(i + 1).append("\n").append(list.get(i)).append("\n");
                 sb.append("// -------------------------------------------------------------- \n");
             }
         }
         return sb.toString();
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jo = new JSONObject();
+        jo.put("source", source);
+        jo.put("examples", new JSONArray(list));
+        return jo;
     }
 }

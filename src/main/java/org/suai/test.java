@@ -1,9 +1,13 @@
 package org.suai;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.suai.parser.*;
 
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,15 +54,42 @@ public class test {
 //            System.out.println(example);
 //        }
         ///////////////////////
-        Example example = null;
-        ParserCplusplus parser = new ParserCplusplus();
-        try {
-            example = parser.findExample("strcmp");
-        } catch (ParseException e) {
-            e.printStackTrace();
+//        Example example = null;
+//        ParserCplusplus parser = new ParserCplusplus();
+//        try {
+//            example = parser.findExample("strcmp");
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//        if (example != null) {
+//            System.out.println(example);
+//        }
+
+        /////////////////
+
+        Example example = new Example("somecite.com", "codeline1\ncodeline2\ncodeline3");
+        example.addExample("codeline1\ncodeline2\ncodeline3\ncodeline4");
+
+        Example example1 = new Example("somecite.com", "codsaceline1\ncodesdcline2\ncodesdcline3");
+        example1.addExample("codesdcline1\ncodsdceline2\ncodsdceline3\ncodsdceline4");
+
+        ArrayList<Example> examples = new ArrayList<>();
+        examples.add(example);
+        examples.add(example1);
+//        System.out.println(new JSONObject(example));
+//        System.out.println(new JSONArray(example.getList()));
+
+        /*PrintStream out = System.out;
+        out.print("{\n");
+        out.print("\"results\":[\n");
+        for (int i = 0; i < examples.size(); i++) {
+            out.print(examples.get(i).toJSONObject());
+            if (i != examples.size() - 1) {
+                out.print(",");
+            }
+            out.print("\n");
         }
-        if (example != null) {
-            System.out.println(example);
-        }
+        out.print("]\n}");
+//        System.out.println(example.toJSONObject());*/
     }
 }

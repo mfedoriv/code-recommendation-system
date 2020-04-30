@@ -25,16 +25,19 @@ public class ParserSearchcode implements Parser {
                 JSONObject o = results.getJSONObject(i);
                 ////////////////// Get full file of source code
                 int id = o.getInt("id");
+//                System.out.println("Searchcode ID: " + id + "\n");
                 StringBuilder exampleBuilder = new StringBuilder();
                 URL codeURL = new URL("https://searchcode.com/api/result/" + id + "/");
                 HttpURLConnection codeConnection = (HttpURLConnection) codeURL.openConnection();
                 BufferedReader codeReader = new BufferedReader(new InputStreamReader(codeConnection.getInputStream()));
-                String codeLine;
-                while ((codeLine = codeReader.readLine()) != null) {
-                    JSONObject codeObj = new JSONObject(codeLine);
-                    exampleBuilder.append(codeObj.getString("code"));
-                    exampleBuilder.append("\n");
+                String line = null;
+                StringBuilder codeLine = new StringBuilder();
+                while ((line = codeReader.readLine()) != null) {
+                    codeLine.append(line);
                 }
+                JSONObject codeObj = new JSONObject(codeLine.toString());
+                exampleBuilder.append(codeObj.getString("code"));
+                exampleBuilder.append("\n");
                 codeReader.close();
                 ///////////////// Get several lines of source code containing funcName
                 /*JSONObject lines = o.getJSONObject("lines");
