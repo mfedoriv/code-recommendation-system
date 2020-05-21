@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
 public interface Parser {
-    public Example findExample(String funcName) throws ParseException;
+    public ArrayList<Example> findExample(String funcName) throws ParseException;
 
     public default String getResponse(String urlString, boolean isCompressed) throws ParseException {
         HttpURLConnection connection = null;

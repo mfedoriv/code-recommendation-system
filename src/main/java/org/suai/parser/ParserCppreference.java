@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +60,7 @@ public class ParserCppreference implements Parser {
     }
 
     @Override
-    public Example findExample(String funcName) throws ParseException {
+    public ArrayList<Example> findExample(String funcName) throws ParseException {
        String funcURL = getFuncURL(funcName);
         URL url = null;
         try {
@@ -76,6 +77,7 @@ public class ParserCppreference implements Parser {
         String startPattern = "<div dir=\"ltr\" (.*)c source-c\"><pre class=\"de1\"><span class=\"co2\">(.*)";
         String endPattern = "(.*)</span></pre></div></div>";
         StringBuilder out = new StringBuilder();
+        ArrayList<Example> examples = new ArrayList<>();
         int stringCounter = 0;
         try {
             is = url.openStream();  // throws an IOException
@@ -125,6 +127,7 @@ public class ParserCppreference implements Parser {
             }
         }
 //        System.out.println("Done!");
-        return new Example("cppreference.com", out.toString());
+        examples.add(new Example(funcURL, out.toString()));
+        return examples;
     }
 }

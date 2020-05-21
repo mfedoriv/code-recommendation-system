@@ -7,13 +7,13 @@ import org.suai.Example;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.ArrayList;
 
 public class ParserSearchcode implements Parser {
 
     @Override
-    public Example findExample(String funcName) throws ParseException {
-        Example example = new Example("searchcode.com");
+    public ArrayList<Example> findExample(String funcName) throws ParseException {
+        ArrayList<Example> examples = new ArrayList<>();
         try {
             // search code examples on C/C++ with lines of code 20<len<30
             String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=100&lan=16&lan=28&loc2=200";
@@ -48,11 +48,11 @@ public class ParserSearchcode implements Parser {
                     exampleBuilder.append("\n");
                 }*/
                 ////////////
-                example.addExample(exampleBuilder.toString());
+                examples.add(new Example("github.com/USER/REPOSITORY/tree/", exampleBuilder.toString()));
             }
         } catch (IOException e) {
             throw new ParseException(e.getMessage());
         }
-        return example;
+        return examples;
     }
 }

@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,15 +68,6 @@ public class test {
 
         /////////////////
 
-        Example example = new Example("somecite.com", "codeline1\ncodeline2\ncodeline3");
-        example.addExample("codeline1\ncodeline2\ncodeline3\ncodeline4");
-
-        Example example1 = new Example("somecite.com", "codsaceline1\ncodesdcline2\ncodesdcline3");
-        example1.addExample("codesdcline1\ncodsdceline2\ncodsdceline3\ncodsdceline4");
-
-        ArrayList<Example> examples = new ArrayList<>();
-        examples.add(example);
-        examples.add(example1);
 //        System.out.println(new JSONObject(example));
 //        System.out.println(new JSONArray(example.getList()));
 
@@ -91,5 +83,20 @@ public class test {
         }
         out.print("]\n}");
 //        System.out.println(example.toJSONObject());*/
+
+        //////////////////////////
+        Example ex1 = new Example("github.com", "somecodeline1\ncodeline2\ncodeline3");
+        ex1.setRating(10);
+        Example ex2 = new Example("github.com", "somecodeline1\ncodeline2\ncodeline3\ncodeline4");
+        ex2.setRating(5);
+        Example ex3 = new Example("github.com", "somecodeline1\ncodeline2\ncodeline3\ncodeline4\ncodeline5\ncodeline6");
+        ex3.setRating(7);
+        ArrayList<Example> examples = new ArrayList<>();
+        examples.add(ex1);
+        examples.add(ex2);
+        examples.add(ex3);
+        System.out.println(examples);
+        Collections.sort(examples);
+        System.out.println(examples);
     }
 }

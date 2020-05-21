@@ -3,12 +3,14 @@ import org.suai.Example;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.regex.*;
 
 public class ParserStackoverflow implements Parser {
     @Override
-    public Example findExample(String funcName) throws ParseException {
-        Example example = new Example("stackowerflow.com");
+    public ArrayList<Example> findExample(String funcName) throws ParseException {
+        ArrayList<Example> examples = new ArrayList<>();
 
         String key = "6T)svt*aUTaibpaVcYCxjA(("; // Auth key
 
@@ -34,7 +36,7 @@ public class ParserStackoverflow implements Parser {
                     code = matcher.group(1);
                     if (code.contains("\n") && code.contains(funcName)) { // check is this a multiline code or just highlighting
                         code = code.replaceAll("&lt;", "<").replaceAll("&gt;", ">"); // for libraries
-                        example.addExample(code);
+                        examples.add(new Example(o.getString("link"), code));
                         break;
                     }
                 }
@@ -42,6 +44,6 @@ public class ParserStackoverflow implements Parser {
 
         }
 
-        return example;
+        return examples;
     }
 }

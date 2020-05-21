@@ -34,6 +34,7 @@ def getFuncName(line, column):
         raise Exception("Can\'t find function name in this line. Move the cursor to another position or line.")
 
 def get_data(func_name):
+    sublime.status_message('Searching examples of using ' + func_name + ' (it may take up to 5 sec)...')
     try:
         url = "http://localhost:8080/getcode?func=" + func_name
         req = request.Request(url)
@@ -41,23 +42,15 @@ def get_data(func_name):
         req.add_header('User-agent', 'Mozilla/5.0')
         with request.urlopen(req) as response:
             results = json.loads(response.read().decode("utf-8"))
-            examples = []
-            for result in results:
-                for example in result["examples"]:
-                    examples.append(example)
-            return examples
+            return results
     except urllib.error.HTTPError as error:
         return json.loads(error.read().decode("utf-8"))
 
 def get_const_data(func_name):
     print("GET DATA\n")
-    input_file = open ("C:/Users/mf050/AppData/Roaming/Sublime Text 3/Packages/User/data_fopen_escaped.json")
+    input_file = open ("C:/Users/mf050/AppData/Roaming/Sublime Text 3/Packages/User/data_fopen_new.json")
     results = json.load(input_file)
-    examples = []
-    for result in results:
-        for example in result["examples"]:
-            examples.append(example)
-    return examples
+    return results
 
 class CoderecsysCommand(sublime_plugin.TextCommand):
 
@@ -85,16 +78,17 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
 
         try:
             func_name = getFuncName(cur_line, pos[1])
-            print("Func name: ", func_name)
 
             li_tree = ""
             final_data = get_data(func_name)
             #final_data = get_const_data(func_name)
+            print(type(final_data[0]))
             for i in range(len(final_data)):
-                escaped = final_data[i].replace("<","&lt;").replace(">","&gt;")
+                source = "source: " + final_data[i]["source"]
+                escaped = final_data[i]["code"].replace("<","&lt;").replace(">","&gt;")
                 escaped = escaped.replace("\n", "<br>").replace(" ", "&nbsp;")
-                divider = "____________________________________________________"
-                li_tree += "<li>%s <a href='%s'>Copy</a></li><p>%s</p>" %(escaped, escaped, divider)
+                divider = "<b>____________________________________________________</b>"
+                li_tree += "<li><p>%s</p>%s <a href='%s'>Copy</a></li><p>%s</p>" %(source, escaped, escaped, divider)
         # The html to be shown.
             html = """
                 <body id=copy-multiline>
@@ -130,16 +124,17 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
                     </ul>
                 </body>
             """ %(func_name, li_tree)
-            self.view.show_popup(html, max_width=700, on_navigate=lambda example: self.copy_example(example, func_name))
+            self.view.show_popup(html, max_width=700, on_navigate=lambda example: self.copy_example(example, func_name, source))
         except Exception as ex:
             self.view.show_popup("<b style=\"color:#1c87c9\">CodeRec Error:</b> " + str(ex), max_width=700)
             # print(ex)
             
-    def copy_example(self, example, func_name):
+    def copy_example(self, example, func_name, source):
         # Copies the todo to the clipboard.
-        # print("COPY")
+        print("COPY")
         de_escaped = example.replace("&lt;", "<").replace("&gt;", ">")
         de_escaped = de_escaped.replace("<br>", "\n").replace("&nbsp;", " ")
+        de_escaped = "// " + source + de_escaped
         sublime.set_clipboard(de_escaped)
         self.view.hide_popup()
         sublime.status_message('Example of using ' + func_name + ' copied to clipboard !')

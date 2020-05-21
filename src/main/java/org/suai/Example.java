@@ -1,53 +1,45 @@
 package org.suai;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Example {
-    private ArrayList<String> list;
+public class Example implements Comparable<Example> {
     private String source;
+    private int rating;
+    private String code;
 
-    public Example() {
-        list = new ArrayList<>();
-        source = null;
-    }
-
-    public Example(String src) {
-        list = new ArrayList<>();
+    public Example(String src, String codeEx) {
         source = src;
+        rating = 0;
+        code = codeEx;
     }
 
-    public Example(String src, String initExample) {
-        list = new ArrayList<>();
-        list.add(initExample);
-        source = src;
+    public String getCode() {
+        return code;
     }
 
-    public void addExample(String example) {
-        list.add(example);
+    public String getSource() {
+        return source;
     }
 
-    public ArrayList<String> getList() {
-        return list;
+    public int getRating() {
+        return rating;
     }
 
-    public void setSource(String src) {
-        source = src;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("// Source of examples: ").append(source).append("\n");
-        if (list.isEmpty()) {
-            sb.append("// Sorry. Can't find examples.");
+        sb.append("// Source of example: ").append(source).append("\n");
+        sb.append("// Rating: ").append(rating).append("\n");
+        if (code == null) {
+            sb.append("// Sorry. Can't find code.\n");
         } else {
-            for (int i = 0; i < list.size(); i++) {
-                sb.append("// Example ").append(i + 1).append("\n").append(list.get(i)).append("\n");
-                sb.append("// -------------------------------------------------------------- \n");
-            }
+            sb.append(code).append("\n");
         }
         return sb.toString();
     }
@@ -55,7 +47,15 @@ public class Example {
     public JSONObject toJSONObject() {
         JSONObject jo = new JSONObject();
         jo.put("source", source);
-        jo.put("examples", new JSONArray(list));
+        jo.put("rating", rating);
+        jo.put("code", code);
         return jo;
+    }
+
+    @Override
+    public int compareTo(Example ex) {
+        int compareRating = ex.getRating();
+        // descending order
+        return compareRating - this.rating;
     }
 }

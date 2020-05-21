@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
 public class ParserCplusplus implements Parser {
 
     @Override
-    public Example findExample(String funcName) throws ParseException {
+    public ArrayList<Example> findExample(String funcName) throws ParseException {
 //        InputStream is = null;
 //        FileInputStream fis = null;
 //        BufferedReader br;
@@ -25,6 +26,7 @@ public class ParserCplusplus implements Parser {
         String startPattern = "<td class=\"source\"><pre><code>(.*)";
         String endPattern = "(.*)</code></pre></td>(.*)";
         StringBuilder out = new StringBuilder();
+        ArrayList<Example> examples = new ArrayList<>();
         int stringCounter = 0;
         try {
 //            URL url = new URL("http://www.cplusplus.com/" + funcName);
@@ -82,6 +84,7 @@ public class ParserCplusplus implements Parser {
             Pattern p_end = Pattern.compile(endPattern, Pattern.CASE_INSENSITIVE);
             Matcher m;
 
+
             boolean findFlag = false;
             while ((line = reader.readLine()) != null && !findFlag) {
                 m = p_start.matcher(line);
@@ -93,16 +96,17 @@ public class ParserCplusplus implements Parser {
                     while(!m.find()){
                         String originalLine = reader.readLine();
                         line = originalLine.replaceAll("\\<[^>]*>",""); // exclude html-tags
-                        line = line.replaceAll("&lt;", "<").replaceAll("&gt;", ">"); // for libraries
+                        line = line.replaceAll("&lt;", "<").replaceAll("&gt;", ">"); // for #include
                         out.append(line);
                         out.append("\n");
                         m = p_end.matcher(originalLine);
                     }
                     findFlag = true;
+                    examples.add(new Example(url, out.toString()));
                 }
             }
             if (!findFlag) {
-                return new Example("cplusplus.com", "Example is not found!");
+                throw new ParseException("Example is not found!");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -112,7 +116,8 @@ public class ParserCplusplus implements Parser {
             }
         }
 //        System.out.println("Done!");
-        return new Example("cplusplus.com", out.toString());
+
+        return examples;
     }
 
     /*private String getFuncURL(String funcName) throws ParseException {

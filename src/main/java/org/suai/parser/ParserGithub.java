@@ -10,10 +10,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class ParserGithub implements Parser {
     @Override
-    public Example findExample(String funcName) throws ParseException {
+    public ArrayList<Example> findExample(String funcName) throws ParseException {
         String oauthToken = null;
         try(BufferedReader br = new BufferedReader(new FileReader("src/main/java/org/suai/github_token.txt"))) {
             for(String line; (line = br.readLine()) != null; ) {

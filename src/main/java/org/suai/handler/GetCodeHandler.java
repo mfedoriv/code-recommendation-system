@@ -23,7 +23,7 @@ public class GetCodeHandler extends HttpServlet {
         ArrayList<Parser> parsers = initParsers();
         try {
             for (Parser parser : parsers) {
-                examples.add(parser.findExample(funcName));
+                examples.addAll(parser.findExample(funcName));
             }
         } catch (ParseException e) {
             e.printStackTrace();
