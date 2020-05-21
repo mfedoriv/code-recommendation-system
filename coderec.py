@@ -43,10 +43,21 @@ def get_data(func_name):
             results = json.loads(response.read().decode("utf-8"))
             examples = []
             for result in results:
-                examples.append(result["examples"])
+                for example in result["examples"]:
+                    examples.append(example)
             return examples
     except urllib.error.HTTPError as error:
         return json.loads(error.read().decode("utf-8"))
+
+def get_const_data(func_name):
+    print("GET DATA\n")
+    input_file = open ("C:/Users/mf050/AppData/Roaming/Sublime Text 3/Packages/User/data_fopen_escaped.json")
+    results = json.load(input_file)
+    examples = []
+    for result in results:
+        for example in result["examples"]:
+            examples.append(example)
+    return examples
 
 class CoderecsysCommand(sublime_plugin.TextCommand):
 
@@ -72,17 +83,18 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
         pos = v.rowcol(v.sel()[0].begin()) # (row, column)
         print("Position of cursor in line: ", pos[1])
 
-        # view.window().show_quick_panel(items = "0","1","2","3"], selected_index = 3, on_select = lambda x: print("s:%i"%x), on_highlight = lambda x: print("h:%i"%x))
-
         try:
             func_name = getFuncName(cur_line, pos[1])
             print("Func name: ", func_name)
 
             li_tree = ""
             final_data = get_data(func_name)
+            #final_data = get_const_data(func_name)
             for i in range(len(final_data)):
-                li_tree += "<li>%s <a href='%s'>Copy</a></li>\n" %(final_data[i], final_data[i])
-
+                escaped = final_data[i].replace("<","&lt;").replace(">","&gt;")
+                escaped = escaped.replace("\n", "<br>").replace(" ", "&nbsp;")
+                divider = "____________________________________________________"
+                li_tree += "<li>%s <a href='%s'>Copy</a></li><p>%s</p>" %(escaped, escaped, divider)
         # The html to be shown.
             html = """
                 <body id=copy-multiline>
@@ -95,48 +107,39 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
                             background-color: #1c87c9;
                             border: none;
                             color: white;
-                            padding: 2px 5px;
+                            padding: 3px 6px;
                             text-align: center;
                             text-decoration: none;
                             display: inline-block;
-                            font-size: 10px;
+                            font-size: 12px;
                             margin: 4px 2px;
                             cursor: pointer;
                         }
-                    </style>
 
+                        p {
+                            color: #1c87c9;
+                        }
+
+                        b {
+                            color: #1c87c9;
+                        }
+                    </style>
+                    Examples of using <b>%s</b> function.
                     <ul>
                         %s
                     </ul>
                 </body>
-            """ %(li_tree)
-            self.view.show_popup(html, max_width=512, on_navigate=lambda todo: self.copy_todo(todo))
-            '''
-            split = re.split(r'[\(]+', cur_line) # split by '('
-            print("Splitted (", split)
-            split = split[-2].strip()
-            result = re.findall(r'\w+', split) # find by letters and numbers ([a-zA-Z0-9_])
-            func_name = result[-1]
-            print("Function name: ", func_name)
-            '''
-
-            '''
-            # -------------------------Request to server---------------------------
-            url = "http://localhost:8080/getcode"
-            my_url = url + "?func=" + func_name
-            req = request.Request(my_url)
-            resp = request.urlopen(req)
-            resp_lines = resp.readlines()
-            for line in resp_lines:
-                print(line)
-                '''
+            """ %(func_name, li_tree)
+            self.view.show_popup(html, max_width=700, on_navigate=lambda example: self.copy_example(example, func_name))
         except Exception as ex:
-            #print("Error! Can't find a function in this", line_begin+1, "line. Try again on other line.")
-            #print(sys.exc_info()[1])
-            print(ex)
+            self.view.show_popup("<b style=\"color:#1c87c9\">CodeRec Error:</b> " + str(ex), max_width=700)
+            # print(ex)
             
     def copy_example(self, example, func_name):
         # Copies the todo to the clipboard.
-        sublime.set_clipboard(example)
+        # print("COPY")
+        de_escaped = example.replace("&lt;", "<").replace("&gt;", ">")
+        de_escaped = de_escaped.replace("<br>", "\n").replace("&nbsp;", " ")
+        sublime.set_clipboard(de_escaped)
         self.view.hide_popup()
         sublime.status_message('Example of using ' + func_name + ' copied to clipboard !')

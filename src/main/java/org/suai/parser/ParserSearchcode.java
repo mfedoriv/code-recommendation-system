@@ -16,7 +16,7 @@ public class ParserSearchcode implements Parser {
         Example example = new Example("searchcode.com");
         try {
             // search code examples on C/C++ with lines of code 20<len<30
-            String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=100lan=16&lan=28&loc=20&loc2=30";
+            String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=100&lan=16&lan=28&loc2=200";
             String response = getResponse(urlSearch, false);
 
             JSONObject jo = new JSONObject(response);
