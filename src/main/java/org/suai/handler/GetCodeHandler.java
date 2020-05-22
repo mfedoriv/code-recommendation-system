@@ -3,6 +3,7 @@ package org.suai.handler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.Example;
+import org.suai.Utils;
 import org.suai.parser.*;
 
 import javax.servlet.http.HttpServlet;
@@ -16,8 +17,14 @@ import java.util.Map;
 public class GetCodeHandler extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp){
-        Map<String, String[]> parameterMap = req.getParameterMap();
-        String funcName = parameterMap.get("func")[0];
+        String funcName;
+        if (req.getAttribute("func") != null) {
+            funcName = (String)req.getAttribute("func");
+        } else {
+            Map<String, String[]> parameterMap = req.getParameterMap();
+            funcName = parameterMap.get("func")[0];
+        }
+
         System.out.println("Request: " + funcName);
         ArrayList<Example> examples = new ArrayList<>();
         ArrayList<Parser> parsers = initParsers();
@@ -29,18 +36,25 @@ public class GetCodeHandler extends HttpServlet {
             e.printStackTrace();
         }
         try (PrintWriter out = resp.getWriter()) {
-            // Print as text
-            /*out.print("// Example of usage " + funcName + "\n");
-            for (Example example : examples) {
-                out.print(example);
-                out.print("\n// ##############################################################\n");
-            }*/
-            // Print as JSON format
-            JSONArray results = new JSONArray();
-            for (int i = 0; i < examples.size(); i++) {
-                results.put(examples.get(i).toJSONObject());
+            if (req.getAttribute("printType") == "text") {
+                // Print as text
+                out.print("// Example of usage <b>" + funcName + "</b><br>");
+                for (Example example : examples) {
+                    out.print("Source: <a href=\"" + example.getSource() + "\" target=\"_blank\">" + example.getSource() + "</a><br>");
+                    out.print("Rating: " + example.getRating() + "<br><br>");
+                    String escaped = Utils.escapeHTML(example.getCode());
+                    out.print(escaped);
+                    out.print("<br><br>// #####################################################################################<br><br>");
+                }
+            } else {
+                // Print as JSON format
+                JSONArray results = new JSONArray();
+                for (int i = 0; i < examples.size(); i++) {
+                    results.put(examples.get(i).toJSONObject());
+                }
+                out.print(results); // JSONArray
             }
-            out.print(results); // JSONArray
+
         } catch (IOException e) {
             e.printStackTrace();
         }
