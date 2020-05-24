@@ -16,7 +16,7 @@ In directory with *pom.xml* run `mvn clean install`
 2. In **Browser**:
     1. You can check the server status by going to the address in the browser [http://localhost:8080/status](http://localhost:8080/status).
     2. You can search for examples of using the functions in your browser by going to [http://localhost:8080/search](http://localhost:8080/search).
-    3. To get the result as JSON go to the address [http://localhost:8080/getcode](http://localhost:8080/getcode) and pass the name of the C function in the **func** parameter. For example [http://localhost:8080/getcode?func=fopen](http://localhost:8080/getcode?func=fopen)
+    3. To get the result as JSON go to the address [http://localhost:8080/getcode](http://localhost:8080/getcode) and send the name of the C function in the **func** parameter. For example [http://localhost:8080/getcode?func=fopen](http://localhost:8080/getcode?func=fopen)
 3. In **Sublime Text 3**:
     1. Place your cursor on the name of the C function;
     2. Press `Alt+Shift+C`

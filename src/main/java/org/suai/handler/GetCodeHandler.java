@@ -18,25 +18,34 @@ public class GetCodeHandler extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp){
         String funcName;
-        if (req.getAttribute("func") != null) {
-            funcName = (String)req.getAttribute("func");
-        } else {
-            Map<String, String[]> parameterMap = req.getParameterMap();
-            funcName = parameterMap.get("func")[0];
-        }
-
-        System.out.println("Request: " + funcName);
-        ArrayList<Example> examples = new ArrayList<>();
-        ArrayList<Parser> parsers = initParsers();
-        for (Parser parser : parsers) {
-            try {
-                examples.addAll(parser.findExample(funcName.toLowerCase()));
-            } catch (ParseException e) {
-                System.out.println("Example of usage "+ funcName.toUpperCase() + " not found on the site: " + e.getMessage());
-            }
-        }
-
         try (PrintWriter out = resp.getWriter()) {
+            if (req.getAttribute("func") != null) {
+                funcName = (String)req.getAttribute("func");
+            }
+            else {
+                Map<String, String[]> parameterMap = req.getParameterMap();
+
+                if (parameterMap.isEmpty()){
+                    resp.getWriter().print("Please send the name of the C function in the func parameter. " +
+                            "For example http://localhost:8080/getcode?func=fopen");
+                    throw new ParseException("Empty parameters");
+                } else {
+                    funcName = parameterMap.get("func")[0];
+                }
+            }
+
+            System.out.println("Request: " + funcName);
+            ArrayList<Example> examples = new ArrayList<>();
+            ArrayList<Parser> parsers = initParsers();
+            for (Parser parser : parsers) {
+                try {
+                    examples.addAll(parser.findExample(funcName.toLowerCase()));
+                } catch (ParseException e) {
+                    System.out.println("Example of usage "+ funcName.toUpperCase() + " not found on the site: " + e.getMessage());
+                }
+            }
+
+
             if (req.getAttribute("printType") == "text") {
                 if (examples.isEmpty()) {
                     out.print("Examples of usage <b>" + funcName.toUpperCase() + "</b> not found!<br>" +
@@ -61,8 +70,8 @@ public class GetCodeHandler extends HttpServlet {
                 out.print(results); // JSONArray
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | ParseException e) {
+            System.out.println("Error! " + e.getMessage());
         }
 
     }
