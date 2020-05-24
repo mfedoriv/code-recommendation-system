@@ -85,7 +85,7 @@ public class test {
 //        System.out.println(example.toJSONObject());*/
 
         //////////////////////////
-        Example ex1 = new Example("github.com", "somecodeline1\ncodeline2\ncodeline3");
+        /*Example ex1 = new Example("github.com", "somecodeline1\ncodeline2\ncodeline3");
         ex1.setRating(10);
         Example ex2 = new Example("github.com", "somecodeline1\ncodeline2\ncodeline3\ncodeline4");
         ex2.setRating(5);
@@ -97,6 +97,8 @@ public class test {
         examples.add(ex3);
         System.out.println(examples);
         Collections.sort(examples);
-        System.out.println(examples);
+        System.out.println(examples);*/
+
+//        ParserClass.downloadWebpage("https://www.cplusplus.com/", "cplusplus.html");
     }
 }

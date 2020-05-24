@@ -8,30 +8,32 @@ import sys
 import json
 
 
-def getFuncName(line, column):
+def get_func_name(line, column):
     # test: file = (char**)calloc12(500, sizeof(char*));
-    # split = cur_line.split('(')[0]
     right_index = column
-    left_index = column
+    left_index = column - 1
     while right_index < len(line):
         if re.match(r'\w', line[right_index]):
             char = line[right_index]
             right_index += 1
         else:
             break
-    while left_index >= 0:
+    while left_index > 0:
         if re.match(r'\w', line[left_index]):
             char = line[left_index]
             left_index -= 1
         else:
             break
-    print("left: ", left_index, "right: ", right_index)
-    func_name = line[left_index+1:right_index]
+
+    func_name = line[left_index:right_index]
+    while line[right_index] == " ":
+        right_index += 1
     if re.match(r'\(', line[right_index]):
         # print("Func Name: ", func_name)
-        return func_name
+        return func_name.strip()
     else:
         raise Exception("Can\'t find function name in this line. Move the cursor to another position or line.")
+
 
 def get_data(func_name):
     sublime.status_message('Searching examples of using ' + func_name + ' (it may take up to 5 sec)...')
@@ -46,22 +48,72 @@ def get_data(func_name):
     except urllib.error.HTTPError as error:
         return json.loads(error.read().decode("utf-8"))
 
+
 def get_const_data(func_name):
-    print("GET DATA\n")
-    input_file = open ("C:/Users/mf050/AppData/Roaming/Sublime Text 3/Packages/User/data_fopen_new.json")
+    input_file = open ("C:/Users/mf050/AppData/Roaming/Sublime Text 3/Packages/User/data_printf.json")
     results = json.load(input_file)
     return results
 
-class CoderecsysCommand(sublime_plugin.TextCommand):
 
+def escape_html(s):
+    out = ""
+    i = 0
+    while i < len(s):
+        c = s[i]
+        number = ord(c)
+        if number > 127 or c == '"' or c == '\'' or c == '<' or c == '>' or c == '&':
+            out += "&#"
+            out += str(number)
+            out += ";"
+        else:
+            out += c
+        i += 1
+    out = out.replace(" ", "&nbsp;")
+    out = out.replace("\n", "<br>")
+    return out
+
+
+def unescape_html(s):
+    s = s.replace("<br>", "\n")
+    s = s.replace("&nbsp;", " ")
+    out = ""
+    i = 0
+    while i < len(s):
+        if s[i] == "&" and s[i+1] == "#":
+            i += 2
+            number = ""
+            while s[i] != ";":
+                number += s[i]
+                i += 1
+            out += chr(int(number))
+            i += 1
+        else:
+            out += s[i]
+            i += 1
+    return out
+
+def dumb_escape_html(s):
+    entities = [["&", "&amp;"], ["<", "&lt;"], [">", "&gt;"], ["\n", "<br>"],
+                [" ", "&nbsp;"]]
+    for entity in entities:
+        s = s.replace(entity[0], entity[1])
+    return s
+
+def dumb_unescape_html(s):
+    entities = [["&lt;", "<"], ["&gt;", ">"], ["<br>", "\n"],
+                ["&nbsp;", " "], ["&amp;", "&"]]
+    for entity in entities:
+        s = s.replace(entity[0], entity[1])
+    return s
+
+
+class CoderecsysCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # self.view.insert(edit, 0, "Hello, World!")
-        # line_number = self.view.lines(self.Region.begin(), self.Region.end())
         v = self.view
         sel_text = v.substr(v.sel()[0])
         cur_line = v.substr(v.line(v.sel()[0]))
-        #print (v.sel()[0])
-        #print (v.line(v.sel()[0]))
+
         print("Filename: ", v.file_name())
         print ("Selected text: ", sel_text)
         # cpp-name identificator ([a-zA-Z_][a-zA-Z0-9_]*)
@@ -70,29 +122,26 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
             line_end = v.rowcol(sel.end())[0]
             print("Line number: ", line_begin + 1)
             print("End number: ", line_end + 1)
-            #self.view.insert(edit, sel.end(), str(line_begin + 1))
 
         print ("Line: ", cur_line)
         pos = v.rowcol(v.sel()[0].begin()) # (row, column)
         print("Position of cursor in line: ", pos[1])
 
         try:
-            func_name = getFuncName(cur_line, pos[1])
-
+            func_name = get_func_name(cur_line, pos[1]-1)
+            print(func_name)
             li_tree = ""
             final_data = get_data(func_name)
             #final_data = get_const_data(func_name)
-            print(type(final_data[0]))
             for i in range(len(final_data)):
                 source = "source: " + final_data[i]["source"]
-                escaped = final_data[i]["code"].replace("<","&lt;").replace(">","&gt;")
-                escaped = escaped.replace("\n", "<br>").replace(" ", "&nbsp;")
+                escaped = dumb_escape_html(final_data[i]["code"])
                 divider = "<b>____________________________________________________</b>"
                 li_tree += "<li><p>%s</p>%s <a href='%s'>Copy</a></li><p>%s</p>" %(source, escaped, escaped, divider)
         # The html to be shown.
             html = """
-                <body id=copy-multiline>
-                    <style>
+                <head></head>
+                                    <style>
                         ul {
                             margin: 0;
                         }
@@ -118,9 +167,12 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
                             color: #1c87c9;
                         }
                     </style>
+                <body id=copy-multiline>
                     Examples of using <b>%s</b> function.
                     <ul>
+                    <code>
                         %s
+                    </code>
                     </ul>
                 </body>
             """ %(func_name, li_tree)
@@ -129,12 +181,11 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
             self.view.show_popup("<b style=\"color:#1c87c9\">CodeRec Error:</b> " + str(ex), max_width=700)
             # print(ex)
             
+
     def copy_example(self, example, func_name, source):
-        # Copies the todo to the clipboard.
-        print("COPY")
-        de_escaped = example.replace("&lt;", "<").replace("&gt;", ">")
-        de_escaped = de_escaped.replace("<br>", "\n").replace("&nbsp;", " ")
-        de_escaped = "// " + source + de_escaped
-        sublime.set_clipboard(de_escaped)
+        # Copies the code to the clipboard.
+        unescaped = dumb_unescape_html(example)
+        unescaped = "// " + source + unescaped
+        sublime.set_clipboard(unescaped)
         self.view.hide_popup()
         sublime.status_message('Example of using ' + func_name + ' copied to clipboard !')

@@ -19,7 +19,7 @@ public class Utils {
             }
         }
         return out.toString().replaceAll("\\n", "<br>")
-                .replaceAll(" ", "&nbsp;");
+                .replaceAll(" ", "&nbsp;&nbsp;");
     }
 
     public static String getDataFromFile(String path) {

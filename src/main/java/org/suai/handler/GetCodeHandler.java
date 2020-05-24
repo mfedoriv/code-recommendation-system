@@ -28,23 +28,29 @@ public class GetCodeHandler extends HttpServlet {
         System.out.println("Request: " + funcName);
         ArrayList<Example> examples = new ArrayList<>();
         ArrayList<Parser> parsers = initParsers();
-        try {
-            for (Parser parser : parsers) {
-                examples.addAll(parser.findExample(funcName));
+        for (Parser parser : parsers) {
+            try {
+                examples.addAll(parser.findExample(funcName.toLowerCase()));
+            } catch (ParseException e) {
+                System.out.println("Example of usage "+ funcName.toUpperCase() + " not found on the site: " + e.getMessage());
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+
         try (PrintWriter out = resp.getWriter()) {
             if (req.getAttribute("printType") == "text") {
-                // Print as text
-                out.print("// Example of usage <b>" + funcName + "</b><br>");
-                for (Example example : examples) {
-                    out.print("Source: <a href=\"" + example.getSource() + "\" target=\"_blank\">" + example.getSource() + "</a><br>");
-                    out.print("Rating: " + example.getRating() + "<br><br>");
-                    String escaped = Utils.escapeHTML(example.getCode());
-                    out.print(escaped);
-                    out.print("<br><br>// #####################################################################################<br><br>");
+                if (examples.isEmpty()) {
+                    out.print("Examples of usage <b>" + funcName.toUpperCase() + "</b> not found!<br>" +
+                            "Try to change your request.");
+                } else {
+                    // Print as text
+                    out.print("// Examples of usage <b>" + funcName + "</b><br><br>");
+                    for (Example example : examples) {
+                        out.print("Source: <a href=\"" + example.getSource() + "\" target=\"_blank\">" + example.getSource() + "</a><br>");
+                        out.print("Rating: " + example.getRating() + "<br><br>");
+                        String escaped = Utils.escapeHTML(example.getCode());
+                        out.print(escaped);
+                        out.print("<br><br>// #####################################################################################<br><br>");
+                    }
                 }
             } else {
                 // Print as JSON format
@@ -67,7 +73,7 @@ public class GetCodeHandler extends HttpServlet {
         parsers.add(new ParserCplusplus());
 //        parsers.add(new ParserGithub());
         parsers.add(new ParserStackoverflow());
-//        parsers.add(new ParserSearchcode());
+        parsers.add(new ParserSearchcode());
 
 
         return parsers;

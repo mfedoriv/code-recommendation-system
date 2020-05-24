@@ -16,21 +16,29 @@ public class ParserStackoverflow implements Parser {
 
         String urlSearch = "https://api.stackexchange.com/2.2/search/advanced?q=" + funcName +
                 "&order=desc&sort=votes&accepted=True&closed=True&migrated=False&tagged=c&site=stackoverflow&filter=!9Z(-wzu0T&key=" + key;
-        String response = getResponse(urlSearch, true);
+        ArrayList<String> response = null;
+        try {
+            response = getResponse(urlSearch, true);
+        } catch (ParseException e) {
+            throw new ParseException("stackoverflow.com");
+        }
 
-        JSONArray results = new JSONObject(response).getJSONArray("items");
+        JSONArray results = new JSONObject(response.get(0)).getJSONArray("items");
+        boolean isFound = false;
         for (int i = 0; i < results.length(); i++) {
             JSONObject o = results.getJSONObject(i);
             int acceptedAnswerId = o.getInt("accepted_answer_id");
             String urlAnswer = "https://api.stackexchange.com/2.2/answers/" + acceptedAnswerId +
                     "?order=desc&sort=activity&site=stackoverflow&filter=!9Z(-wzu0T&key=" + key;
-            String responseAnswer = getResponse(urlAnswer, true);
-            JSONArray answerJson = new JSONObject(responseAnswer).getJSONArray("items");
+            ArrayList<String> responseAnswer = getResponse(urlAnswer, true);
+            JSONArray answerJson = new JSONObject(responseAnswer.get(0)).getJSONArray("items");
             String answer = answerJson.getJSONObject(0).getString("body");
             // Parse answer
             Pattern pattern = Pattern.compile("<pre><code>(.+?)</code>(.*)", Pattern.DOTALL);
             Matcher matcher = pattern.matcher(answer);
+
             if (answer.contains("<code>")) {
+                isFound = true;
                 String code = null;
                 while (matcher.find()) { // for answers that include several code examples
                     code = matcher.group(1);
@@ -41,7 +49,9 @@ public class ParserStackoverflow implements Parser {
                     }
                 }
             }
-
+        }
+        if (!isFound) {
+            throw new ParseException("stackoverflow.com");
         }
 
         return examples;
