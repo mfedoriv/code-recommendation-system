@@ -4,9 +4,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.parser.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -100,5 +104,27 @@ public class test {
         System.out.println(examples);*/
 
 //        ParserClass.downloadWebpage("https://www.cplusplus.com/", "cplusplus.html");
+        //////////////////////////
+//        int acceptedAnswerId = 1716621;
+//        String key = "EPsz6N*vmgv)QZ9Flb2XBA(("; // Auth key
+//        String urlAnswer = "https://api.stackexchange.com/2.2/answers/" + acceptedAnswerId +
+//                "?order=desc&sort=activity&site=stackoverflow&filter=!B96E4.(oV2Gz(eNZJuonUmqvxKo*65&key=" + key;
+//        ArrayList<String> data = new ArrayList<>();
+//        try (FileWriter writer = new FileWriter("stackoverflow_ansID_" + acceptedAnswerId + ".json")){
+//            data = new ParserStackoverflow().getResponse(urlAnswer, true);
+//            for(String str: data) {
+//                writer.write(str + System.lineSeparator());
+//            }
+//        } catch (ParseException | IOException e) {
+//            e.printStackTrace();
+//        }
+
+        /////////////////////////////////
+//        ParserStackoverflow ps = new ParserStackoverflow();
+//        try {
+//            ps.findExampleFromFile("printf");
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
     }
 }

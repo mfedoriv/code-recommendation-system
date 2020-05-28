@@ -9,7 +9,6 @@ import json
 
 
 def get_func_name(line, column):
-    # test: file = (char**)calloc12(500, sizeof(char*));
     right_index = column
     left_index = column - 1
     while right_index < len(line):
@@ -18,14 +17,18 @@ def get_func_name(line, column):
             right_index += 1
         else:
             break
+    while line[left_index] == " ":
+        left_index -= 1
     while left_index > 0:
-        if re.match(r'\w', line[left_index]):
+        if re.match(r'\w', line[left_index]) and line[left_index] != " ":
             char = line[left_index]
             left_index -= 1
         else:
             break
 
-    func_name = line[left_index:right_index]
+    print("left: ", left_index, "right: ", right_index)
+    func_name = line[left_index+1:right_index]
+    print("In func: [" + func_name + "]")
     while line[right_index] == " ":
         right_index += 1
     if re.match(r'\(', line[right_index]):
@@ -128,14 +131,15 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
         print("Position of cursor in line: ", pos[1])
 
         try:
-            func_name = get_func_name(cur_line, pos[1]-1)
+            func_name = get_func_name(cur_line, pos[1])
             print(func_name)
             li_tree = ""
-            final_data = get_data(func_name)
-            #final_data = get_const_data(func_name)
+            #final_data = get_data(func_name)
+            final_data = get_const_data(func_name)
             for i in range(len(final_data)):
                 source = "source: " + final_data[i]["source"]
                 escaped = dumb_escape_html(final_data[i]["code"])
+                #escaped = final_data[i]["code"]
                 divider = "<b>____________________________________________________</b>"
                 li_tree += "<li><p>%s</p>%s <a href='%s'>Copy</a></li><p>%s</p>" %(source, escaped, escaped, divider)
         # The html to be shown.
@@ -170,9 +174,7 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
                 <body id=copy-multiline>
                     Examples of using <b>%s</b> function.
                     <ul>
-                    <code>
                         %s
-                    </code>
                     </ul>
                 </body>
             """ %(func_name, li_tree)

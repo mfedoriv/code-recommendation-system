@@ -1,9 +1,8 @@
 package org.suai;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Utils {
     public static String escapeHTML(String s) {
@@ -23,17 +22,38 @@ public class Utils {
     }
 
     public static String getDataFromFile(String path) {
-        BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
-        try {
-            br = new BufferedReader(new FileReader(path));
-            String style_str;
-            while ((style_str = br.readLine()) != null) {
-                sb.append(style_str);
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String str;
+            while ((str = br.readLine()) != null) {
+                sb.append(str);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    public static void downloadWebpage(String urlString, String fileName) {
+        URL url = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (url != null) {
+            try(
+                    BufferedReader reader =  new BufferedReader(new InputStreamReader(url.openStream()));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            )  {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    writer.write(line);
+                }
+                System.out.println("Webpage " + url.toString() + " downloaded successfully!");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

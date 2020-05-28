@@ -21,16 +21,21 @@ public class ParserCppreference implements Parser {
 
         Pattern p_start = Pattern.compile(startPattern, Pattern.CASE_INSENSITIVE);
         Matcher m;
-
+        boolean isFind = false;
         for(int i = 0; i < response.size(); i++) {
             line = response.get(i);
             m = p_start.matcher(line);
             if (m.find()) {
+                isFind = true;
                 line = line.replaceAll("<li>(.*)href=\"", "").replaceAll("\" title=(.*)</div>", ""); //delete all except URI
 //                    System.out.println(line);
                 break;
             }
         }
+        if (!isFind) {
+            throw new ParseException("cppreference.com");
+        }
+
         return "https://en.cppreference.com" + line;
     }
 

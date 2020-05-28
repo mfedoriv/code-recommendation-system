@@ -82,7 +82,7 @@ public class GetCodeHandler extends HttpServlet {
         parsers.add(new ParserCplusplus());
 //        parsers.add(new ParserGithub());
         parsers.add(new ParserStackoverflow());
-        parsers.add(new ParserSearchcode());
+//        parsers.add(new ParserSearchcode());
 
 
         return parsers;
