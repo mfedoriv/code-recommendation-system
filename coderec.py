@@ -134,8 +134,8 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
             func_name = get_func_name(cur_line, pos[1])
             print(func_name)
             li_tree = ""
-            #final_data = get_data(func_name)
-            final_data = get_const_data(func_name)
+            final_data = get_data(func_name)
+            #final_data = get_const_data(func_name)
             for i in range(len(final_data)):
                 source = "source: " + final_data[i]["source"]
                 escaped = dumb_escape_html(final_data[i]["code"])
