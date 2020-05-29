@@ -97,13 +97,13 @@ def unescape_html(s):
 
 def dumb_escape_html(s):
     entities = [["&", "&amp;"], ["<", "&lt;"], [">", "&gt;"], ["\n", "<br>"],
-                [" ", "&nbsp;"]]
+                [" ", "&nbsp;"], ["'", "`"]]
     for entity in entities:
         s = s.replace(entity[0], entity[1])
     return s
 
 def dumb_unescape_html(s):
-    entities = [["&lt;", "<"], ["&gt;", ">"], ["<br>", "\n"],
+    entities = [["`", "'"], ["&lt;", "<"], ["&gt;", ">"], ["<br>", "\n"],
                 ["&nbsp;", " "], ["&amp;", "&"]]
     for entity in entities:
         s = s.replace(entity[0], entity[1])
