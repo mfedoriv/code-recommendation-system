@@ -9,10 +9,13 @@ import org.suai.parser.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
 
 public class GetCodeHandler extends HttpServlet {
     @Override
@@ -78,11 +81,26 @@ public class GetCodeHandler extends HttpServlet {
 
     private ArrayList<Parser> initParsers() {
         ArrayList<Parser> parsers = new ArrayList<>();
-        parsers.add(new ParserCppreference());
-        parsers.add(new ParserCplusplus());
-//        parsers.add(new ParserGithub());
-        parsers.add(new ParserStackoverflow());
-//        parsers.add(new ParserSearchcode());
+
+        Properties properties = new Properties();
+        try (FileReader fr = new FileReader("coderec.properties")){
+            properties.load(fr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (properties.getProperty("ParserCplusplus_enabled", "false").toLowerCase().equals("true")) {
+            parsers.add(new ParserCplusplus());
+        }
+        if (properties.getProperty("ParserCppreference_enabled", "false").toLowerCase().equals("true")) {
+            parsers.add(new ParserCppreference());
+        }
+        if (properties.getProperty("ParserStackoverflow_enabled", "false").toLowerCase().equals("true")) {
+            parsers.add(new ParserStackoverflow());
+        }
+        if (properties.getProperty("ParserSearchcode_enabled", "false").toLowerCase().equals("true")) {
+            parsers.add(new ParserSearchcode());
+        }
 
 
         return parsers;

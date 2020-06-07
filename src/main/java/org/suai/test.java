@@ -4,15 +4,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.parser.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,5 +126,28 @@ public class test {
 //        } catch (ParseException e) {
 //            e.printStackTrace();
 //        }
+
+////////////////////////////////
+
+        ParserCplusplus p = new ParserCplusplus();
+        System.out.println(p.getClass().getName());
+        System.out.println(p.getClass().getSimpleName());
+
+        Properties properties = new Properties();
+//        properties.setProperty(p.getClass().getSimpleName() + "_enabled", "True");
+//        System.out.println(properties.get(p.getClass().getSimpleName() + "_enabled"));
+//        try {
+//            properties.store(new FileWriter("coderec.properties"), "Configuration file of Code Recommendation System.");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        try {
+            properties.load(new FileReader("coderec.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(properties.get(p.getClass().getSimpleName() + "_enabled"));
+        System.out.println(properties.toString());
+        System.out.println(properties.getProperty("hello"));
     }
 }

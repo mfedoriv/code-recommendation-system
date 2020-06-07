@@ -7,6 +7,7 @@ import org.suai.handler.GetCodeHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.suai.handler.SearchHandler;
+import org.suai.handler.SettingsHandler;
 import org.suai.handler.StatusHandler;
 
 public class CodeRecServer {
@@ -17,6 +18,7 @@ public class CodeRecServer {
         handler.addServlet(GetCodeHandler.class, "/getcode");
         handler.addServlet(StatusHandler.class, "/status");
         handler.addServlet(SearchHandler.class, "/search");
+        handler.addServlet(SettingsHandler.class, "/settings");
 
         server.setHandler(handler);
 

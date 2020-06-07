@@ -9,6 +9,11 @@ b {
     color:#1c87c9;
 }
 
+p.alert {
+    color: #c92c4b;
+    font-weight: bold;
+}
+
 .search {
     width: 100%;
     position: relative;
@@ -42,6 +47,18 @@ b {
     font-size: 18px;
 }
 
+.saveButton {
+    width: 80px;
+    height: 36px;
+    border: 1px solid #00B4CC;
+    background: rgb(0, 129, 204);
+    text-align: center;
+    color: #fff;
+    border-radius: 5px 5px 5px 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
 /*Resize the wrap to see the search bar change!*/
 .wrap{
     width: 30%;
@@ -49,4 +66,36 @@ b {
     top: 20%;
     left: 20%;
     transform: translate(-50%, -50%);
+}
+
+.layer{
+    width: 70%;
+}
+
+.tokenInput {
+    width: 30%;
+    border: 3px solid #00B4CC;
+    padding: 5px;
+    height: 15px;
+    border-radius: 5px 5px 5px 5px;
+    outline: none;
+    color: rgb(0, 129, 204);
+}
+
+div.scrollmenu {
+    background-color: #00B4CC;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+div.scrollmenu a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+
+div.scrollmenu a:hover {
+    background-color: rgb(0, 129, 204);
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CodeRecSystem Settings Page</title>
+    <style type="text/css">
+        STYLE
+    </style>
+</head>
+<body>
+<div class="scrollmenu">
+    <a href="/search">Search</a>
+    <a href="/status">Status</a>
+    <a href="/settings">Settings</a>
+</div>
+<h1>CodeRecSystem</h1>
+<h2>Settings</h2>
+<h4>On this page you can configure the CodeRecSystem settings</h4>
+<br>
+
+<form id="sectionForm" method="post" action="settings">
+    <div class="layer">
+        <p><b>Sites to be searched on</b></p>
+        <input type="checkbox" name="ParserCplusplus_enabled" value="true" CHECKED_cplusplus>Cplusplus.com<Br>
+        <input type="checkbox" name="ParserCppreference_enabled" value="true" CHECKED_cppreference>CPPreference.com<Br>
+        <input type="checkbox" name="ParserStackoverflow_enabled" value="true" CHECKED_stackoverflow>StackOverflow.com<Br>
+        <input type="checkbox" name="ParserSearchcode_enabled" value="true" CHECKED_searchcode>GitHub.com, GitLab.com, Bitbucket.com and etc.</p>
+        <p>The more sites are selected, the more examples of using the function will be, but it will also work slower (especially for StackOverflow and GitHub/GitLab/Bitbucket sites).</p>
+        <p><b>StackOverflow Token</b></p>
+        <p>To search on Stackoverflow you must be registered on this site and get a token. The token is needed by the application to authenticate on the site (more details can be found at <a target="_blank" href="https://api.stackexchange.com/docs/authentication">StackOverflow Authentification</a>).</p>
+        <p>To get a token you need to click on the link below:</p>
+        <a target="_blank" href="https://stackoverflow.com/oauth/dialog?client_id=17978&scope=no_expiry&redirect_uri=https://stackexchange.com/oauth/login_success">Get your Access Token</a>
+        <p>After the transition you should press the "Confirm" button, then you will be passed to the page with <b>access_token</b> in URL parameters. For example:</p>
+        <p>"https://stackexchange.com/oauth/login_success#access_token=wGg8hTyBJMs8jT*PI*PLtA))"></p>
+        <p>In this example, the token is "wGgg8hTyBJMs8jT*PI*PLtA))" (it's not valid).</p>
+        <p>Your token now: YOUR_TOKEN</p>
+        <p>To set or change, insert a token in the field below:</p>
+        <input type="text" class= "tokenInput" name="token" placeholder="To change place your token here">
+        <p><input type="submit" class="saveButton" value="Save"></p>
+    </div>
+</form>
+<script>
+    (function() {
+        const form = document.querySelector('#sectionForm');
+        const checkboxes = form.querySelectorAll('input[type=checkbox]');
+        const checkboxLength = checkboxes.length;
+        const firstCheckbox = checkboxLength > 0 ? checkboxes[0] : null;
+
+        function init() {
+            if (firstCheckbox) {
+                for (let i = 0; i < checkboxLength; i++) {
+                    checkboxes[i].addEventListener('change', checkValidity);
+                }
+
+                checkValidity();
+            }
+        }
+
+        function isChecked() {
+            for (let i = 0; i < checkboxLength; i++) {
+                if (checkboxes[i].checked) return true;
+            }
+
+            return false;
+        }
+
+        function checkValidity() {
+            const errorMessage = !isChecked() ? 'At least one cite must be selected.' : '';
+            firstCheckbox.setCustomValidity(errorMessage);
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>

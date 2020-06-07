@@ -37,7 +37,6 @@ public class SearchHandler extends HttpServlet {
                         RequestDispatcher rd = req.getRequestDispatcher("getcode");
                         rd.include(req, resp);
                     }
-                    StringBuilder sb = new StringBuilder();
                     line = " ";
                 }
                 out.println(line);

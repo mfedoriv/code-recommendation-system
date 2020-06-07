@@ -5,6 +5,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.Utils;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.*;
 
@@ -13,8 +15,19 @@ public class ParserStackoverflow implements Parser {
     public ArrayList<Example> findExample(String funcName) throws ParseException {
         ArrayList<Example> examples = new ArrayList<>();
 
-//        String key = "6T)svt*aUTaibpaVcYCxjA(("; // Old Auth key
-        String key = "EPsz6N*vmgv)QZ9Flb2XBA(("; // Auth key
+        Properties properties = new Properties();
+        try (FileReader fr = new FileReader("coderec.properties")){
+            properties.load(fr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //        String key = "6T)svt*aUTaibpaVcYCxjA(("; // Old Auth key
+        String key = "EPsz6N*vmgv)QZ9Flb2XBA(("; // Auth key (This is not considered a secret!)
+        String access_token = properties.getProperty("token"); // This is unique for every user and must keep secret!
+        if (access_token.length() <= 0) {
+            throw new ParseException("stackoverflow.com. Error! Can't find StackOverflow token!" +
+                    "You must set your token on http://localhost:8080/settings page.");
+        }
         String filter = "!*1ScCIwlbiqdYGrs2eRmgiIODFQSC.SIIJfIF(JuP";
 //
 ///2.2/search/advanced?order=desc&sort=relevance&q=printf&accepted=True&nottagged=c++&tagged=c;printf&site=stackoverflow&filter=!*1ScCIwlbiqdYGrs2eRmgiIODFQSC.SIIJfIF(JuP
@@ -23,11 +36,11 @@ public class ParserStackoverflow implements Parser {
         // with 'funcName' tag for better search
         urlSearches.add("https://api.stackexchange.com/2.2/search/advanced?q=" + funcName +
                 "&order=desc&sort=relevance&accepted=True&site=stackoverflow&filter=" + filter +
-                "&nottagged=c%2B%2B&tagged=c%3B" + funcName + "&key=" + key);
+                "&nottagged=c%2B%2B&tagged=c%3B" + funcName + "&key=" + key + "&access_token=" + access_token);
         // without 'funcName' tag
         urlSearches.add("https://api.stackexchange.com/2.2/search/advanced?q=" + funcName +
                 "&order=desc&sort=relevance&accepted=True&site=stackoverflow&filter=" + filter +
-                "&nottagged=c%2B%2B&tagged=c&key=" + key);
+                "&nottagged=c%2B%2B&tagged=c&key=" + key + "&access_token=" + access_token);
         boolean isFound = false;
         for (String urlSearch: urlSearches) {
             ArrayList<String> response = null;
@@ -43,7 +56,8 @@ public class ParserStackoverflow implements Parser {
 //            /2.2/answers/2524675?order=desc&sort=activity&site=stackoverflow&filter=!B96E4.(oV2Gz(eNZJuonUmqvxKo*65
 //            !9Z(-wzu0T // old filter
                 String urlAnswer = "https://api.stackexchange.com/2.2/answers/" + acceptedAnswerId +
-                        "?order=desc&sort=activity&site=stackoverflow&filter=!-Kh(ZYuip9YGwltuOUoudmWLcrmMYLnp*&key=" + key;
+                        "?order=desc&sort=activity&site=stackoverflow&filter=!-Kh(ZYuip9YGwltuOUoudmWLcrmMYLnp*&key="
+                        + key + "&access_token=" + access_token;
                 ArrayList<String> responseAnswer = getResponse(urlAnswer, true);
                 JSONArray answerJson = new JSONObject(responseAnswer.get(0)).getJSONArray("items");
                 String answer = answerJson.getJSONObject(0).getString("body");

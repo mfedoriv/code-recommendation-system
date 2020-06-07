@@ -15,7 +15,7 @@ public class ParserSearchcode implements Parser {
     public ArrayList<Example> findExample(String funcName) throws ParseException {
         ArrayList<Example> examples = new ArrayList<>();
         // search code examples on C/C++ with lines of code 10<len<200
-        String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=100&lan=16&lan=28&loc=10&loc2=200";
+        String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=100&lan=28&loc=10&loc2=200";
         ArrayList<String> response = getResponse(urlSearch, false);
         String responseString = String.join("\n", response);
         JSONObject jo = new JSONObject(responseString);
