@@ -2,6 +2,7 @@ package org.suai;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.suai.analyser.Analyser;
 import org.suai.parser.*;
 
 import java.io.*;
@@ -9,10 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -129,11 +127,11 @@ public class test {
 
 ////////////////////////////////
 
-        ParserCplusplus p = new ParserCplusplus();
-        System.out.println(p.getClass().getName());
-        System.out.println(p.getClass().getSimpleName());
-
-        Properties properties = new Properties();
+//        ParserCplusplus p = new ParserCplusplus();
+//        System.out.println(p.getClass().getName());
+//        System.out.println(p.getClass().getSimpleName());
+//
+//        Properties properties = new Properties();
 //        properties.setProperty(p.getClass().getSimpleName() + "_enabled", "True");
 //        System.out.println(properties.get(p.getClass().getSimpleName() + "_enabled"));
 //        try {
@@ -141,13 +139,49 @@ public class test {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+//        try {
+//            properties.load(new FileReader("coderec.properties"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+////        System.out.println(properties.get(p.getClass().getSimpleName() + "_enabled"));
+//        System.out.println(properties.toString());
+//        System.out.println(properties.getProperty("hello"));
+        /////////////////////////////
+        /*ParserSearchcode parserSearchcode = new ParserSearchcode();
         try {
-            properties.load(new FileReader("coderec.properties"));
-        } catch (IOException e) {
+            ArrayList<Example> examples = parserSearchcode.findExample("fopen");
+            // Print as JSON format
+            JSONArray results = new JSONArray();
+            for (int i = 0; i < examples.size(); i++) {
+                results.put(examples.get(i).toJSONObject());
+            }
+            Utils.writeDataToFile("searchcode_fopen.txt", results.toString());
+        } catch (ParseException e) {
             e.printStackTrace();
+        }*/
+        ////////////////////////////////////////////////////
+        JSONArray examplesJSON = new JSONArray(Utils.getDataFromFile("searchcode_fopen.txt"));
+        System.out.println(examplesJSON.toString());
+        HashSet<Example> examples = new HashSet<>();
+        for (int i = 0; i < examplesJSON.length(); i++) {
+            JSONObject example = examplesJSON.getJSONObject(i);
+            String code = example.getString("code");
+            System.out.println(i);
+            examples.add(new Analyser().analyse(new Example(example), "fopen"));
+//            System.out.println("Without comments: " + new Analyser().analyse(new Example(example), "fopen") +
+//                    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         }
-//        System.out.println(properties.get(p.getClass().getSimpleName() + "_enabled"));
-        System.out.println(properties.toString());
-        System.out.println(properties.getProperty("hello"));
+        ArrayList<Example> examplesList = new ArrayList<Example>(examples);
+        examplesList.sort(new Comparator<Example>() {
+            @Override
+            public int compare(Example o1, Example o2) { //descending order
+                return o2.getRating() - o1.getRating();
+            }
+        });
+        for (Example ex: examplesList) {
+            System.out.println(ex);
+            System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        }
     }
 }

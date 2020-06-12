@@ -102,7 +102,6 @@ public class GetCodeHandler extends HttpServlet {
             parsers.add(new ParserSearchcode());
         }
 
-
         return parsers;
     }
 }

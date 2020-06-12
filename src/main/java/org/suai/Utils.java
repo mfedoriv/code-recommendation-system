@@ -34,6 +34,14 @@ public class Utils {
         return sb.toString();
     }
 
+    public static void writeDataToFile(String path, String data) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
+            bw.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void downloadWebpage(String urlString, String fileName) {
         URL url = null;
         try {
