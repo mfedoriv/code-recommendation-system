@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 public class Example implements Comparable<Example> {
+
     private String source;
     private int rating;
     private String code;
@@ -30,6 +31,12 @@ public class Example implements Comparable<Example> {
         this.source = example.getString("source");
         this.rating = example.getInt("rating");
         this.code = example.getString("code");
+    }
+
+    public Example(Example example) {
+        this.source = example.getSource();
+        this.code = example.getCode();
+        this.rating = example.getRating();
     }
 
     public String getCode() {

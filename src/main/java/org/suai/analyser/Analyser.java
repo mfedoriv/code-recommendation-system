@@ -1,6 +1,7 @@
 package org.suai.analyser;
 
 import org.suai.Example;
+import org.suai.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -21,29 +22,40 @@ public class Analyser {
             this.code = code;
         }
     }
-    public Example analyse (Example ex, String funcName) {
-        ex = deleteComments(ex);
-        Result[] res = new Result[0];
-        try {
-            res = extractFunction(ex, funcName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("Found functions: " + res.length);
-        Example exampleAnalysed = new Example(ex.getSource());
-        if (res.length > 0) {
-            exampleAnalysed = countRating(res, 0.95, 0.7, ex.getSource());
-        }
-        return exampleAnalysed;
 
+    public Example analyse (Example ex, String funcName) {
+        Example exampleAnalysed;
+        if (ex.getSource().contains("cplusplus.com") ||
+                ex.getSource().contains("cppreference.com")) {
+            exampleAnalysed = new Example(ex);
+            exampleAnalysed.setRating(1000);
+            return exampleAnalysed;
+        } else if (ex.getSource().contains("stackoverflow.com")) {
+            return new Example(ex);
+        } else { // for searchcode (github, gitlab, bitbucket and etc.)
+            ex = deleteComments(ex);
+            Result[] res = new Result[0];
+            try {
+                res = extractFunction(ex, funcName);
+            } catch (ParseException e) {
+                return new Example(ex.getSource(), null, 0);
+            }
+//            System.out.println("Found functions: " + res.length);
+            exampleAnalysed = new Example(ex.getSource());
+            if (res.length > 0) {
+                exampleAnalysed = countRating(res, 0.95, 0.7, ex.getSource());
+            }
+            return exampleAnalysed;
+        }
     }
-    public Example deleteComments (Example ex) {
+
+    private Example deleteComments (Example ex) {
         String code = ex.getCode().replaceAll("(?s:\\/\\*.*?\\*\\/)|\\/\\/.*", "");
         ex.setCode(code);
         return ex;
     }
 
-    private Result[] extractFunction(Example ex, String funcName) throws Exception {
+    private Result[] extractFunction(Example ex, String funcName) throws ParseException {
         // .*\w+\s*\(.*\)\s*\{
         // \n((?!if|for|while|do|switch)([\w\*]+( )*?){2,}\(([^!@#$+%^;]+?)\)(?!\s*;))
         // ^([\w\*]+( )*?){2,}\(([^!@#$+%^;]+?)\)(?!\s*;)  // it's work
@@ -51,7 +63,7 @@ public class Analyser {
         // \n(([\w*]+( )*?){2,}\(([^!@#$+%^;]+?)\)(?!\s*;))\s*\{  // \s*\{  --- with open bracket in the end (don't work)
         String[] lines = ex.getCode().split("\\r?\\n");
 
-        Pattern beginPattern = Pattern.compile("\\n(([\\w*]+( )*?){2,}\\(([^!@#$+%^;]+?)\\)(?!\\s*;)[^;])");
+        Pattern beginPattern = Pattern.compile("\\n(([\\w*]+( )*?){2,}\\(([^!@#$+%^;]*?)\\)(?!\\s*;)[^;])");
         Matcher beginMatcher = beginPattern.matcher(ex.getCode());
         ArrayList<String> funcDefinitionsHead = new ArrayList<>();
         while (beginMatcher.find()) {
@@ -61,7 +73,7 @@ public class Analyser {
             }
         }
         if (funcDefinitionsHead.isEmpty()) {
-            throw new Exception("Can't find function definition!");
+            throw new ParseException("Can't find function definition!");
         }
         ////////////////////////
         /*System.out.println("FUNCTIONS: _____________________");
@@ -104,6 +116,9 @@ public class Analyser {
                 }
                 i++; // pass first open bracket of function definition
                 do {
+                    if (i >= lines.length - 1)
+                        break;
+
                     if (lines[i].contains("{")) {
                         curNesting++;
                     }
@@ -139,10 +154,13 @@ public class Analyser {
 
         ArrayList<String> funcCodes = new ArrayList<>();
         int foundFunctions = funcDefinitionsHead.size();
+        ArrayList<Integer> foundFuncIndexes = new ArrayList<>();
         for (int i = 0; i < funcDefinitionsHead.size(); i++) {
             if (!funcNameOnLine[i]) {
                 foundFunctions--;
                 continue; // if this func don't contain funcName in body
+            } else {
+                foundFuncIndexes.add(i);
             }
             ArrayList<Integer> funcLines = new ArrayList<>();
             for (int j = beginFuncIndexes[i]; j <= endFuncIndexes[i]; j++) {
@@ -154,11 +172,12 @@ public class Analyser {
                 set.addAll(notFuncIndexes.get(0));
             }
             set.addAll(funcLines);
+            funcSize[i] = set.size();
             StringBuffer sb = new StringBuffer();
             int setI = 0;
             for (Integer lineN: set) {
                 String line = lines[lineN];
-                if (line.equals("")) { // if line is empty than not append it in funcCode
+                if (line.equals("") || line.matches("\\s*")) { // if line is empty than not append it in funcCode
                     if (setI >= beginFuncIndexes[i] && setI <= endFuncIndexes[i]) { // if it's line from function body
                         funcSize[i]--; // decrease size
                     }
@@ -169,9 +188,12 @@ public class Analyser {
             }
             funcCodes.add(sb.toString());
         }
+        if (foundFunctions <= 0) {
+            throw new ParseException("Can't find functions that using " + funcName);
+        }
         Result[] results = new Result[foundFunctions];
         for (int i = 0; i < results.length; i++) {
-            results[i] = new Result(funcSize[i], maxNestings[i], funcCodes.get(i));
+            results[i] = new Result(funcSize[foundFuncIndexes.get(i)], maxNestings[foundFuncIndexes.get(i)], funcCodes.get(i));
         }
 
         return results;
@@ -193,8 +215,10 @@ public class Analyser {
                 k = res.maxNesting - 2;
             }
             double nestingRating = 500 * Math.pow(nestingCoef, k);
-
-            rating.add(sizeRating + nestingRating);
+            double scaleCoef = 0.7; // parts of code from GitHub, GitLab and other can't be better examples, than code
+            // from cplusplus, cppreference and StackOverflow cites. So rating of examples from GitHub-like cites
+            // should be scaled down.
+            rating.add((sizeRating + nestingRating) * scaleCoef);
         }
         double maxRating = 0;
         int indexOfMaxRatingFunc = 0;

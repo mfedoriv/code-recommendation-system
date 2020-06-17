@@ -1,0 +1,33 @@
+#include <stdio.h>
+int main ()
+{
+    FILE * pFile;
+    pFile = fopen ("myfile.txt","w");
+
+    char ch;
+    char str[100];
+    printf("Enter any character n");
+    scanf("%c", &ch);
+    printf("Entered character is %c n", ch);
+    printf("Enter any string ( upto 100 character ) n");
+    scanf("%s", &str);
+    printf("Entered string is %s n", str);
+    if (pFile != NULL)
+    {
+        if (strcmp("1", ch)) {
+        fputs ("fopen example",pFile);
+        fclose (pFile);
+    }
+        if (strcmp("1", ch)) {
+            if (strcmp("file", str)) {
+                fputs ("fopen example",pFile);
+            }
+            fclose (pFile);
+        }
+    }
+    /*
+    some comments
+    comments
+    */
+    return 0;
+}

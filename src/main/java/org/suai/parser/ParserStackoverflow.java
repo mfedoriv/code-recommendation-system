@@ -1,4 +1,5 @@
 package org.suai.parser;
+
 import org.suai.Example;
 
 import org.json.JSONArray;
@@ -80,15 +81,20 @@ public class ParserStackoverflow implements Parser {
                     }
                 }
                 if (!codes.isEmpty()) {
+                    // choose biggest part of code from answer if there was more than one
                     codes.sort(new Comparator<String>() {
                         @Override
                         public int compare(String o1, String o2) { //descending order
                             return o2.length() - o1.length();
                         }
                     });
-                    Example ex = new Example(o.getString("link"), codes.get(0));
-                    ex.setRating(o.getInt("score"));
-                    examples.add(ex);
+                    // return only answers with score > 0
+                    int score = o.getInt("score");
+                    if (score > 0){
+                        Example ex = new Example(o.getString("link"), codes.get(0));
+                        ex.setRating(score);
+                        examples.add(ex);
+                    }
                 }
             }
             if (isFound) {

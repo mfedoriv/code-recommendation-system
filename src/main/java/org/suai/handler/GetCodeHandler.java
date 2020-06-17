@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.Example;
 import org.suai.Utils;
+import org.suai.analyser.Analyser;
 import org.suai.parser.*;
 
 import javax.servlet.http.HttpServlet;
@@ -13,9 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class GetCodeHandler extends HttpServlet {
     @Override
@@ -48,6 +47,21 @@ public class GetCodeHandler extends HttpServlet {
                 }
             }
 
+            HashSet<Example> examplesSet = new HashSet<>(); // to exclude duplicate elements
+            Analyser analyser = new Analyser();
+            for (int i = 0; i < examples.size(); i++) {
+                Example exAnalysed = analyser.analyse(examples.get(i), funcName);
+                if (exAnalysed.getCode() != null) {
+                    examplesSet.add(exAnalysed);
+                }
+            }
+            examples = new ArrayList<>(examplesSet);
+            examples.sort(new Comparator<Example>() {
+                @Override
+                public int compare(Example o1, Example o2) { //descending order
+                    return o2.getRating() - o1.getRating();
+                }
+            });
 
             if (req.getAttribute("printType") == "text") {
                 if (examples.isEmpty()) {

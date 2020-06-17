@@ -163,16 +163,16 @@ public class test {
         ////////////////////////////////////////////////////
         JSONArray examplesJSON = new JSONArray(Utils.getDataFromFile("searchcode_fopen.txt"));
         System.out.println(examplesJSON.toString());
-        HashSet<Example> examples = new HashSet<>();
+        HashSet<Example> examplesSet = new HashSet<>();
         for (int i = 0; i < examplesJSON.length(); i++) {
             JSONObject example = examplesJSON.getJSONObject(i);
             String code = example.getString("code");
             System.out.println(i);
-            examples.add(new Analyser().analyse(new Example(example), "fopen"));
+            examplesSet.add(new Analyser().analyse(new Example(example), "fopen"));
 //            System.out.println("Without comments: " + new Analyser().analyse(new Example(example), "fopen") +
 //                    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         }
-        ArrayList<Example> examplesList = new ArrayList<Example>(examples);
+        ArrayList<Example> examplesList = new ArrayList<>(examplesSet);
         examplesList.sort(new Comparator<Example>() {
             @Override
             public int compare(Example o1, Example o2) { //descending order

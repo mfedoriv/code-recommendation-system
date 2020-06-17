@@ -17,6 +17,7 @@ public interface Parser {
     public ArrayList<Example> findExample(String funcName) throws ParseException;
 
     public default ArrayList<String> getResponse(String urlString, boolean isCompressed) throws ParseException {
+        urlString = urlString.replaceAll(" ", "+");
         HttpURLConnection connection = null;
         BufferedReader reader;
         String line;
