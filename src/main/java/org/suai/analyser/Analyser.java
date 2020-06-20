@@ -24,6 +24,7 @@ public class Analyser {
     }
 
     public Example analyse (Example ex, String funcName) {
+//        System.out.println("\t" + ex.getSource());
         Example exampleAnalysed;
         if (ex.getSource().contains("cplusplus.com") ||
                 ex.getSource().contains("cppreference.com")) {

@@ -1,5 +1,6 @@
 package org.suai;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -17,23 +18,14 @@ class UtilsTest {
 
     @Test
     void getDataFromFile() {
-        assertEquals("data", Utils.getDataFromFile("src/test/resources/dataForUtilsTest.txt"));
+        assertEquals("data", Utils.getDataFromFile("/dataForUtilsTest.txt"));
     }
 
     @Test
     void writeDataToFile() {
         String dataToWrite = "new data";
-        Utils.writeDataToFile("src/test/resources/dataForUtilsTest.txt", dataToWrite);
-        assertEquals(dataToWrite, Utils.getDataFromFile("src/test/resources/dataForUtilsTest.txt"));
-        Utils.writeDataToFile("src/test/resources/dataForUtilsTest.txt", "data");
-    }
-
-    @Test
-    void downloadWebpage() {
-        String url = "http://cplusplus.com/reference/cstdio/fopen/";
-        Utils.downloadWebpage(url, "src/test/resources/fopen.html");
-        assertTrue(Utils.getDataFromFile("src/test/resources/fopen.html").contains("cplusplus.com"));
-        File file = new File("src/test/resources/fopen.html");
-        file.delete();
+        Utils.writeDataToFile("/dataForUtilsTest.txt", dataToWrite);
+        assertEquals(dataToWrite, Utils.getDataFromFile("/dataForUtilsTest.txt"));
+        Utils.writeDataToFile("/dataForUtilsTest.txt", "data");
     }
 }

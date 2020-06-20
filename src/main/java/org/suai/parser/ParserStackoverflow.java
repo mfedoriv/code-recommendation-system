@@ -6,42 +6,52 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.Utils;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.prefs.Preferences;
 import java.util.regex.*;
 
 public class ParserStackoverflow implements Parser {
     @Override
     public ArrayList<Example> findExample(String funcName) throws ParseException {
+//        System.out.println("Parser Stackoverflow");
+
         ArrayList<Example> examples = new ArrayList<>();
 
+        Preferences prefs = Preferences.userRoot().node("CodeRecSystem");
         Properties properties = new Properties();
-        try (FileReader fr = new FileReader("coderec.properties")){
-            properties.load(fr);
-        } catch (IOException e) {
-            e.printStackTrace();
+        String access_token = prefs.get("token", null); // This is unique for every user and must keep secret!
+        if (access_token == null) {
+            try {
+                properties.load(getClass().getResourceAsStream("/coderec.properties"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            access_token = properties.getProperty("token", "");
+            if (access_token.length() <= 0) {
+                throw new ParseException("stackoverflow.com. Error! Can't find StackOverflow token!" +
+                        "You must set your token in coderec.propreties file before first launch.");
+            }
+            prefs.put("token", access_token);
         }
         //        String key = "6T)svt*aUTaibpaVcYCxjA(("; // Old Auth key
         String key = "EPsz6N*vmgv)QZ9Flb2XBA(("; // Auth key (This is not considered a secret!)
-        String access_token = properties.getProperty("token"); // This is unique for every user and must keep secret!
-        if (access_token.length() <= 0) {
-            throw new ParseException("stackoverflow.com. Error! Can't find StackOverflow token!" +
-                    "You must set your token on http://localhost:8080/settings page.");
-        }
         String filter = "!*1ScCIwlbiqdYGrs2eRmgiIODFQSC.SIIJfIF(JuP";
 //
 ///2.2/search/advanced?order=desc&sort=relevance&q=printf&accepted=True&nottagged=c++&tagged=c;printf&site=stackoverflow&filter=!*1ScCIwlbiqdYGrs2eRmgiIODFQSC.SIIJfIF(JuP
 //        !9Z(-wzu0T //Old filter
         ArrayList<String> urlSearches = new ArrayList<>();
         // with 'funcName' tag for better search
+        int numbOfResults = 8;
         urlSearches.add("https://api.stackexchange.com/2.2/search/advanced?q=" + funcName +
-                "&order=desc&sort=relevance&accepted=True&site=stackoverflow&filter=" + filter +
-                "&nottagged=c%2B%2B&tagged=c%3B" + funcName + "&key=" + key + "&access_token=" + access_token);
+                "&order=desc&sort=relevance&pagesize=" + numbOfResults + "&accepted=True&site=stackoverflow&filter=" +
+                filter + "&nottagged=c%2B%2B&tagged=c%3B" + funcName + "&key=" + key + "&access_token=" + access_token);
         // without 'funcName' tag
         urlSearches.add("https://api.stackexchange.com/2.2/search/advanced?q=" + funcName +
-                "&order=desc&sort=relevance&accepted=True&site=stackoverflow&filter=" + filter +
-                "&nottagged=c%2B%2B&tagged=c&key=" + key + "&access_token=" + access_token);
+                "&order=desc&sort=relevance&pagesize=" + numbOfResults + "&accepted=True&site=stackoverflow&filter=" +
+                filter + "&nottagged=c%2B%2B&tagged=c&key=" + key + "&access_token=" + access_token);
         boolean isFound = false;
         for (String urlSearch: urlSearches) {
             ArrayList<String> response = null;

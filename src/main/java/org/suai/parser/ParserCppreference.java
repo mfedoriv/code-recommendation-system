@@ -41,7 +41,9 @@ public class ParserCppreference implements Parser {
 
     @Override
     public ArrayList<Example> findExample(String funcName) throws ParseException {
-       String funcURL = getFuncURL(funcName);
+//        System.out.println("Parser Cppreference");
+
+        String funcURL = getFuncURL(funcName);
         ArrayList<String> response = getResponse(funcURL, false);
 
         String line;

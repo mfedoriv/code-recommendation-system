@@ -1,7 +1,6 @@
 package org.suai.handler;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.suai.Example;
 import org.suai.Utils;
 import org.suai.analyser.Analyser;
@@ -10,11 +9,9 @@ import org.suai.parser.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
+import java.util.prefs.Preferences;
 
 public class GetCodeHandler extends HttpServlet {
     @Override
@@ -49,7 +46,11 @@ public class GetCodeHandler extends HttpServlet {
 
             HashSet<Example> examplesSet = new HashSet<>(); // to exclude duplicate elements
             Analyser analyser = new Analyser();
+
+//            System.out.println("Analyse " + examples.size() + " examples.");
+
             for (int i = 0; i < examples.size(); i++) {
+//                System.out.println((i+1) + ". example");
                 Example exAnalysed = analyser.analyse(examples.get(i), funcName);
                 if (exAnalysed.getCode() != null) {
                     examplesSet.add(exAnalysed);
@@ -66,11 +67,15 @@ public class GetCodeHandler extends HttpServlet {
             if (req.getAttribute("printType") == "text") {
                 if (examples.isEmpty()) {
                     out.print("Examples of usage <b>" + funcName.toUpperCase() + "</b> not found!<br>" +
-                            "Try to change your request.");
+                            "Try to change your request or add more sites to search on Settings page " +
+                            "if you are looking for functions from 3rd parties libraries.");
                 } else {
                     // Print as text
                     out.print("// Examples of usage <b>" + funcName + "</b><br><br>");
+                    int numb = 1;
                     for (Example example : examples) {
+                        out.print("Example " + numb + "/" + examples.size() + "<br>");
+                        numb++;
                         out.print("Source: <a href=\"" + example.getSource() + "\" target=\"_blank\">" + example.getSource() + "</a><br>");
                         out.print("Rating: " + example.getRating() + "<br><br>");
                         String escaped = Utils.escapeHTML(example.getCode());
@@ -95,24 +100,18 @@ public class GetCodeHandler extends HttpServlet {
 
     private ArrayList<Parser> initParsers() {
         ArrayList<Parser> parsers = new ArrayList<>();
+        Preferences prefs = Preferences.userRoot().node("CodeRecSystem");
 
-        Properties properties = new Properties();
-        try (FileReader fr = new FileReader("coderec.properties")){
-            properties.load(fr);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (properties.getProperty("ParserCplusplus_enabled", "false").toLowerCase().equals("true")) {
+        if (prefs.getBoolean("ParserCplusplus_enabled", false)) {
             parsers.add(new ParserCplusplus());
         }
-        if (properties.getProperty("ParserCppreference_enabled", "false").toLowerCase().equals("true")) {
+        if (prefs.getBoolean("ParserCppreference_enabled", false)) {
             parsers.add(new ParserCppreference());
         }
-        if (properties.getProperty("ParserStackoverflow_enabled", "false").toLowerCase().equals("true")) {
+        if (prefs.getBoolean("ParserStackoverflow_enabled", false)) {
             parsers.add(new ParserStackoverflow());
         }
-        if (properties.getProperty("ParserSearchcode_enabled", "false").toLowerCase().equals("true")) {
+        if (prefs.getBoolean("ParserSearchcode_enabled", false)) {
             parsers.add(new ParserSearchcode());
         }
 

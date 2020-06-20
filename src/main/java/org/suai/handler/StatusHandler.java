@@ -8,10 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class StatusHandler extends HttpServlet {
@@ -20,11 +17,11 @@ public class StatusHandler extends HttpServlet {
         try (PrintWriter out = resp.getWriter()) {
             resp.setCharacterEncoding(StandardCharsets.UTF_8.toString());
             resp.setContentType("charset=UTF-8");
-            BufferedReader br  = new BufferedReader(new FileReader("src/main/resources/Status.html"));
+            BufferedReader br  = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/Status.html")));
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.contains("STYLE")) {
-                    out.print(Utils.getDataFromFile("src/main/resources/style.css"));
+                    out.print(Utils.getDataFromFile("/style.css"));
                 }
                 out.println(line);
             }

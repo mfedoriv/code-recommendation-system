@@ -57,52 +57,14 @@ def get_const_data(func_name):
     results = json.load(input_file)
     return results
 
-
 def escape_html(s):
-    out = ""
-    i = 0
-    while i < len(s):
-        c = s[i]
-        number = ord(c)
-        if number > 127 or c == '"' or c == '\'' or c == '<' or c == '>' or c == '&':
-            out += "&#"
-            out += str(number)
-            out += ";"
-        else:
-            out += c
-        i += 1
-    out = out.replace(" ", "&nbsp;")
-    out = out.replace("\n", "<br>")
-    return out
-
-
-def unescape_html(s):
-    s = s.replace("<br>", "\n")
-    s = s.replace("&nbsp;", " ")
-    out = ""
-    i = 0
-    while i < len(s):
-        if s[i] == "&" and s[i+1] == "#":
-            i += 2
-            number = ""
-            while s[i] != ";":
-                number += s[i]
-                i += 1
-            out += chr(int(number))
-            i += 1
-        else:
-            out += s[i]
-            i += 1
-    return out
-
-def dumb_escape_html(s):
     entities = [["&", "&amp;"], ["<", "&lt;"], [">", "&gt;"], ["\n", "<br>"],
                 [" ", "&nbsp;"], ["'", "`"]]
     for entity in entities:
         s = s.replace(entity[0], entity[1])
     return s
 
-def dumb_unescape_html(s):
+def unescape_html(s):
     entities = [["`", "'"], ["&lt;", "<"], ["&gt;", ">"], ["<br>", "\n"],
                 ["&nbsp;", " "], ["&amp;", "&"]]
     for entity in entities:
@@ -138,10 +100,9 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
             #final_data = get_const_data(func_name)
             for i in range(len(final_data)):
                 source = "source: " + final_data[i]["source"]
-                escaped = dumb_escape_html(final_data[i]["code"])
-                #escaped = final_data[i]["code"]
+                escaped = escape_html(final_data[i]["code"])                #escaped = final_data[i]["code"]
                 divider = "<b>____________________________________________________</b>"
-                li_tree += "<li><p>%s</p>%s <a href='%s'>Copy</a></li><p>%s</p>" %(source, escaped, escaped, divider)
+                li_tree += "<li><p>%s</p>%s <br><a href='%s'>Copy</a></li><p>%s</p>" %(source, escaped, escaped, divider)
         # The html to be shown.
             html = """
                 <head></head>
@@ -178,7 +139,7 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
                     </ul>
                 </body>
             """ %(func_name, li_tree)
-            self.view.show_popup(html, max_width=700, on_navigate=lambda example: self.copy_example(example, func_name, source))
+            self.view.show_popup(html, max_width=700, max_height=400, on_navigate=lambda example: self.copy_example(example, func_name, source))
         except Exception as ex:
             self.view.show_popup("<b style=\"color:#1c87c9\">CodeRec Error:</b> " + str(ex), max_width=700)
             # print(ex)
@@ -186,8 +147,8 @@ class CoderecsysCommand(sublime_plugin.TextCommand):
 
     def copy_example(self, example, func_name, source):
         # Copies the code to the clipboard.
-        unescaped = dumb_unescape_html(example)
-        unescaped = "// " + source + unescaped
+        unescaped = unescape_html(example)
+        unescaped = "// " + source + "\n" + unescaped
         sublime.set_clipboard(unescaped)
         self.view.hide_popup()
         sublime.status_message('Example of using ' + func_name + ' copied to clipboard !')
