@@ -9,8 +9,15 @@ Sublime Text 3 plugin which allows you to get examples of how to use C functions
 2. To add shortcut:
     1. Go to Preferences &#8594;Key bindings.
     2. In the file on the right *Default (...).sublime-keymap – User* add the following line: `{ "keys": ["alt+shift+c"], "command": "coderecsys" }`
-
-#### Create a jar archive of the server
+3. To search on Stackoverflow (and pass all tests to build project to JAR in Maven) you must be registered on this site and get a token. The token is needed by the application to authenticate on the site (more details can be found at <a target="_blank" href="https://api.stackexchange.com/docs/authentication">StackOverflow Authentification</a>).
+    To get a token you need to click on the link below: <a target="_blank" href="https://stackoverflow.com/oauth/dialog?client_id=17978&scope=no_expiry&redirect_uri=https://stackexchange.com/oauth/login_success">Get your Access Token</a>.
+    After the transition you should press the "Approve" button, then you will be passed to the page with <b>access_token</b> in URL parameters. For example:
+    
+    `https://stackexchange.com/oauth/login_success#access_token=wGg8hTyBJMs8jT*PI*PLtA))`
+    
+    In this example, the token is `wGgg8hTyBJMs8jT*PI*PLtA))` (it's not valid).</p>
+    Go to directory /src/main/resources, open file coderec.properties and place your token after "token" parameter. Like that: `token=wGg8hTyBJMs8jT*PI*PLtA))`
+#### Create a JAR-file of the server
 In directory with *pom.xml* run `mvn clean install`
 
 ### Using
@@ -23,5 +30,5 @@ In directory with *pom.xml* run `mvn clean install`
 3. In **Sublime Text 3**:
     1. Place your cursor on the name of the C function;
     2. Press `Alt+Shift+C`
-    3. In a few seconds (~5) a pop-up window will show examples of using the function.
+    3. In a few seconds a pop-up window will show examples of using the function.
     4. To copy the required example, press the **Copy** button below it (the code will be copied to the clipboard), and then paste with the `Ctrl+V` key combination where you want.
