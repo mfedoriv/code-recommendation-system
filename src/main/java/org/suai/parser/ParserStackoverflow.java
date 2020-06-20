@@ -4,11 +4,8 @@ import org.suai.Example;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.suai.Utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.prefs.Preferences;
 import java.util.regex.*;
@@ -36,12 +33,9 @@ public class ParserStackoverflow implements Parser {
             }
             prefs.put("token", access_token);
         }
-        //        String key = "6T)svt*aUTaibpaVcYCxjA(("; // Old Auth key
         String key = "EPsz6N*vmgv)QZ9Flb2XBA(("; // Auth key (This is not considered a secret!)
         String filter = "!*1ScCIwlbiqdYGrs2eRmgiIODFQSC.SIIJfIF(JuP";
-//
-///2.2/search/advanced?order=desc&sort=relevance&q=printf&accepted=True&nottagged=c++&tagged=c;printf&site=stackoverflow&filter=!*1ScCIwlbiqdYGrs2eRmgiIODFQSC.SIIJfIF(JuP
-//        !9Z(-wzu0T //Old filter
+
         ArrayList<String> urlSearches = new ArrayList<>();
         // with 'funcName' tag for better search
         int numbOfResults = 8;
@@ -64,8 +58,6 @@ public class ParserStackoverflow implements Parser {
             for (int i = 0; i < results.length(); i++) {
                 JSONObject o = results.getJSONObject(i);
                 int acceptedAnswerId = o.getInt("accepted_answer_id");
-//            /2.2/answers/2524675?order=desc&sort=activity&site=stackoverflow&filter=!B96E4.(oV2Gz(eNZJuonUmqvxKo*65
-//            !9Z(-wzu0T // old filter
                 String urlAnswer = "https://api.stackexchange.com/2.2/answers/" + acceptedAnswerId +
                         "?order=desc&sort=activity&site=stackoverflow&filter=!-Kh(ZYuip9YGwltuOUoudmWLcrmMYLnp*&key="
                         + key + "&access_token=" + access_token;
@@ -83,6 +75,7 @@ public class ParserStackoverflow implements Parser {
                         // (to exclude functions that start differently: printf, fprintf),
                         // bracket at right and and the other things in the end. In IDEA regexp validator it works
                         // but in code 'funcMatcher.matches()' don't
+                        // EDIT: search can be better with \b, but need to test
                         Matcher funcMatcher = Pattern.compile("(\\W*)" + funcName.toLowerCase() + "(\\s*)\\((.*)").matcher(code);
                         if (funcMatcher.find()) {
                             isFound = true;
@@ -115,54 +108,6 @@ public class ParserStackoverflow implements Parser {
         if (!isFound) {
             throw new ParseException("stackoverflow.com");
         }
-        return examples;
-    }
-
-
-    public ArrayList<Example> findExampleFromFile(String funcName) throws ParseException {
-        ArrayList<Example> examples = new ArrayList<>();
-
-            ArrayList<String> responseAnswer = new ArrayList<>();
-            responseAnswer.add(Utils.getDataFromFile("stackoverflow_ansID_1716621.json"));
-            ////////////////////
-            JSONArray answerJson = new JSONObject(responseAnswer.get(0)).getJSONArray("items");
-            String answer = answerJson.getJSONObject(0).getString("body");
-            // Parse answer
-            Pattern pattern = Pattern.compile("<code>(.+?)</code>", Pattern.DOTALL);
-//            Pattern pattern1 = Pattern.compile("(\\W*)printf(\\s*)\\((.*)", Pattern.DOTALL);
-//            String examp = "printf(\"Buffered, will be flushed\");\nfflush(stdout); // Will now print everything in the stdout buffer\n";
-//            String examp2 = "fprintf(stderr, \"I will be printed immediately\");\n";
-//            System.out.println(examp.matches("(\\W*)printf(\\s*)\\((.*)"));
-//            System.out.println(examp2.matches("(\\W*)printf(\\s*)\\((.*)"));
-            Matcher matcher = pattern.matcher(answer);
-            boolean isFound = false;
-            ArrayList<String> codes = new ArrayList<>();
-            if (answer.contains("<code>")) {
-                while (matcher.find()) {
-                    String code = matcher.group(1);
-                    // Can't understand what's wrong in this regexp that describes function with not word at left
-                    // (to exclude functions that start differently: printf, fprintf),
-                    // bracket at right and and the other things in the end. In IDEA regexp validator it works
-                    // but in code 'funcMatcher.matches()' don't
-                    Matcher funcMatcher = Pattern.compile("(\\W*)" + funcName.toLowerCase() + "(\\s*)\\((.*)").matcher(code);
-                    if (funcMatcher.find()) {
-                        isFound = true;
-                        codes.add(matcher.group(1));
-                    }
-                }
-            }
-        codes.sort(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) { //descending order
-                return o2.length() - o1.length();
-            }
-        });
-            examples.add(new Example("src", codes.get(0)));
-        System.out.println(examples);
-        if (!isFound) {
-            throw new ParseException("stackoverflow.com");
-        }
-
         return examples;
     }
 }

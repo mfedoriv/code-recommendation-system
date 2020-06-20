@@ -63,8 +63,6 @@ public class ParserCplusplus implements Parser {
             throw new ParseException("cplusplus.com");
         }
 
-//        System.out.println("Done!");
-
         return examples;
     }
 }

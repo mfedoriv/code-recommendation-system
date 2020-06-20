@@ -48,7 +48,6 @@ public class GetCodeHandler extends HttpServlet {
             Analyser analyser = new Analyser();
 
 //            System.out.println("Analyse " + examples.size() + " examples.");
-
             for (int i = 0; i < examples.size(); i++) {
 //                System.out.println((i+1) + ". example");
                 Example exAnalysed = analyser.analyse(examples.get(i), funcName);

@@ -51,7 +51,6 @@ public class ParserCppreference implements Parser {
         String endPattern = "(.*)</span></pre></div></div>";
         StringBuilder out = new StringBuilder();
         ArrayList<Example> examples = new ArrayList<>();
-        int stringCounter = 0;
 
         Pattern p_start = Pattern.compile(startPattern, Pattern.CASE_INSENSITIVE);
         Pattern p_end = Pattern.compile(endPattern, Pattern.CASE_INSENSITIVE);
@@ -61,7 +60,6 @@ public class ParserCppreference implements Parser {
         for(int i = 0; i < response.size() && !findFlag; i++) {
             line = response.get(i);
             m = p_start.matcher(line);
-            stringCounter++;
             while (m.find()) {
                 m = p_end.matcher(line);
                 while(!m.find()){
@@ -83,7 +81,6 @@ public class ParserCppreference implements Parser {
         if (!findFlag) {
             throw new ParseException("cppreference.com");
         }
-//        System.out.println("Done!");
         examples.add(new Example(funcURL, out.toString()));
         return examples;
     }
