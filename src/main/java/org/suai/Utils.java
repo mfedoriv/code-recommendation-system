@@ -23,7 +23,7 @@ public class Utils {
 
     public static String getDataFromFile(String path) {
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream(path)))) {
             String str;
             while ((str = br.readLine()) != null) {
                 sb.append(str);
@@ -32,6 +32,14 @@ public class Utils {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    public static void writeDataToFile(String path, String data) {
+        try (PrintWriter writer = new PrintWriter(new File(Utils.class.getResource(path).getPath()))) {
+            writer.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void downloadWebpage(String urlString, String fileName) {
@@ -44,7 +52,7 @@ public class Utils {
         if (url != null) {
             try(
                     BufferedReader reader =  new BufferedReader(new InputStreamReader(url.openStream()));
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+                    PrintWriter writer = new PrintWriter(new File(fileName));
             )  {
                 String line;
                 while ((line = reader.readLine()) != null) {

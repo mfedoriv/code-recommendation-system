@@ -4,18 +4,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.suai.Example;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class ParserSearchcode implements Parser {
 
     @Override
     public ArrayList<Example> findExample(String funcName) throws ParseException {
+//        System.out.println("Parser Searchcode");
+
         ArrayList<Example> examples = new ArrayList<>();
-        // search code examples on C/C++ with lines of code 10<len<200
-        String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=100&lan=16&lan=28&loc=10&loc2=200";
+        int numbOfResults = 20;
+        // search code examples on C with lines of code 10<len<200
+        String urlSearch = "https://searchcode.com/api/codesearch_I/?q=" + funcName + "&per_page=" + numbOfResults + "&lan=28&loc=10&loc2=200";
         ArrayList<String> response = getResponse(urlSearch, false);
         String responseString = String.join("\n", response);
         JSONObject jo = new JSONObject(responseString);

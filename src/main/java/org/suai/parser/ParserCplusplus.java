@@ -16,6 +16,8 @@ public class ParserCplusplus implements Parser {
 
     @Override
     public ArrayList<Example> findExample(String funcName) throws ParseException {
+//        System.out.println("Parser Cplusplus");
+
         HttpURLConnection connection = null;
         BufferedReader reader;
         String line;
@@ -37,15 +39,12 @@ public class ParserCplusplus implements Parser {
         Pattern p_end = Pattern.compile(endPattern, Pattern.CASE_INSENSITIVE);
         Matcher m;
 
-
         boolean findFlag = false;
         for(int i = 0; i < response.size() && !findFlag; i++) {
             line = response.get(i);
             m = p_start.matcher(line);
             stringCounter++;
             while (m.find()) {
-//                    String value = m.group(1);
-//                    out.append(line);
                 m = p_end.matcher(line);
                 while(!m.find()){
                     i++;
@@ -63,8 +62,6 @@ public class ParserCplusplus implements Parser {
         if (!findFlag) {
             throw new ParseException("cplusplus.com");
         }
-
-//        System.out.println("Done!");
 
         return examples;
     }
